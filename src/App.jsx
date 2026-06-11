@@ -295,10 +295,11 @@ export default function App() {
     const nm=[...msgs,{role:"user",content:ut}];
     setMsgs(nm);setLoad(true);
     try {
-      const res=await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:PROMPT,messages:nm}),
-      });
+      const res = await fetch("/api/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({...}),
+});
       const data=await res.json();
       setMsgs([...nm,{role:"assistant",content:data.content?.[0]?.text||"Something went wrong."}]);
     } catch {
