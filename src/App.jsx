@@ -298,7 +298,7 @@ export default function App() {
       const res=await fetch("/api/chat",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:PROMPT,messages:nm}),
+        body:JSON.stringify({model:"claude-3-5-sonnet-20241022",max_tokens:1000,system:PROMPT,messages:nm}),
       });
       const data=await res.json();
       setMsgs([...nm,{role:"assistant",content:data.content?.[0]?.text||"Something went wrong."}]);
