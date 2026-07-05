@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const PROMPT = `You are Dionysia, an elegant wine travel assistant. Help travelers discover wine regions, routes, wineries, and tasting experiences worldwide. Speak in the language the user writes in. Be warm, sophisticated, specific.`;
 
@@ -476,6 +477,7 @@ export default function App() {
       </div>
 
       <Popup item={popup} onClose={()=>setPopup(null)}/>
+      <Analytics />
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap');
