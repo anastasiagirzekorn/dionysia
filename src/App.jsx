@@ -18,6 +18,70 @@ ES:"https://images.unsplash.com/photo-1628691826063-f9b73f6ce0bf?auto=format&fit
 UA:"https://images.unsplash.com/photo-1667152016525-9f64ddd33f7d?auto=format&fit=crop&w=1200&q=80",
 };
 
+// One distinct photo per route (same order as R[country] / RUA[country])
+const RIMG={
+HR:[
+"https://images.unsplash.com/photo-1722100354846-bcbbf697a273?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1747514550264-6613b5afd177?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1553773077-91673524aafa?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1772982903110-d3ba2f38a134?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1661050422671-46dbd7926730?auto=format&fit=crop&w=1200&q=80",
+],
+CZ:[
+"https://images.unsplash.com/photo-1658052829392-fd70d474482c?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1757862969163-57a9415523ed?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1493928847765-7796c605e694?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1605712406831-919abaf0cc70?auto=format&fit=crop&w=1200&q=80",
+],
+FR:[
+"https://images.unsplash.com/photo-1755090249373-dfbf3a462f6c?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1704300815432-76952c1e3562?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1602574923828-853dbbc27277?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1768735584713-7e7eff5fdc34?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1723413516174-8a76575dccd1?auto=format&fit=crop&w=1200&q=80",
+],
+IT:[
+"https://images.unsplash.com/photo-1759062012196-ab43aef31a6f?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1602491399262-55831860b387?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1675026922181-b30935570a78?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1573419020762-3af44eae75cf?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1725103895189-370086c7739f?auto=format&fit=crop&w=1200&q=80",
+],
+PT:[
+"https://images.unsplash.com/photo-1638664370752-8188076afbab?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1680762134192-a1e0637defc7?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1724258778128-108e360ad82a?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1540308990836-5a7b1df6dc00?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1585173847038-1cfe1954c10a?auto=format&fit=crop&w=1200&q=80",
+],
+ES:[
+"https://images.unsplash.com/photo-1628691826063-f9b73f6ce0bf?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1670691377549-155175463898?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1545797182-208561608a32?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1597241673028-8ee11ba6fe8c?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1773268083795-100b46354797?auto=format&fit=crop&w=1200&q=80",
+],
+UA:[
+"https://images.unsplash.com/photo-1667152016525-9f64ddd33f7d?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1646171015962-cda7daa2800c?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1714384896548-4fb6839d2f08?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1653775173971-7b196e470787?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1680513079856-7867ad3f36f3?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1663744952565-2618d51a4829?auto=format&fit=crop&w=1200&q=80",
+],
+};
+
+// One distinct photo per popup region (same order as REG[country] / REGUA[country])
+const GIMG={
+HR:["https://images.unsplash.com/photo-1629277954843-a916d699d90e?auto=format&fit=crop&w=1200&q=80",RIMG.HR[1],RIMG.HR[0]],
+CZ:[RIMG.CZ[2],RIMG.CZ[3],RIMG.CZ[1]],
+FR:[RIMG.FR[0],RIMG.FR[2],RIMG.FR[1]],
+IT:[RIMG.IT[0],RIMG.IT[1],RIMG.IT[2]],
+PT:[RIMG.PT[0],RIMG.PT[1],RIMG.PT[2]],
+ES:[RIMG.ES[0],RIMG.ES[1],RIMG.ES[3]],
+UA:[RIMG.UA[0],RIMG.UA[1],RIMG.UA[2]],
+};
+
 const T={
 en:{
 tag:"Every journey is a new glass",
@@ -432,7 +496,7 @@ onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.s
 <button style={TB(tab==="famous")} onClick={()=>setTab("famous")}>🗺️ {t.fam}</button>
 <button style={TB(tab==="hidden")} onClick={()=>setTab("hidden")}>💎 {t.hid}</button>
 </div>
-{shown.map((r,i)=><Card key={i} route={r} label={t.ask} onAsk={send} img={CIMG[country.code]}/>)}
+{shown.map((r,i)=><Card key={i} route={r} label={t.ask} onAsk={send} img={RIMG[country.code]?.[routes.indexOf(r)]||CIMG[country.code]}/>)}
 <div style={{display:"flex",alignItems:"center",gap:12,margin:"8px 0 14px"}}>
 <div style={{flex:1,height:1,background:B}}/>
 <span style={{color:DIM,fontSize:12,letterSpacing:"0.2em",fontWeight:600}}>{t.or}</span>
@@ -491,7 +555,7 @@ style={{width:40,height:40,borderRadius:"50%",background:inp.trim()&&!load?BTN:"
 </div>
 </div>
 
-<Popup item={popup} img={country?CIMG[country.code]:null} onClose={()=>setPopup(null)}/>
+<Popup item={popup} img={popup&&country?(GIMG[country.code]?.[regs.indexOf(popup)]||CIMG[country.code]):null} onClose={()=>setPopup(null)}/>
 <Analytics />
 
 <style>{`
