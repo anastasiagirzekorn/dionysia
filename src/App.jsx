@@ -84,7 +84,7 @@ UA:[RIMG.UA[0],RIMG.UA[1],RIMG.UA[2]],
 
 const T={
 en:{
-tag:"Every journey is a new glass",
+tag:"Every glass is a new journey",
 sub:"Explore wine routes, hidden vineyards, and unforgettable tasting experiences.",
 choose:"Choose a destination",or:"OR ASK ANYTHING",chat:"Chat with Dionysia",
 back:"Back",dest:"Destinations",fam:"Famous routes",hid:"Hidden gems",
@@ -94,7 +94,7 @@ pour:"Pouring knowledge...",
 welcome:"Welcome to Dionysia 🍷\n\nI'm your personal wine travel guide — here to help you discover iconic wine routes, hidden vineyards, and unforgettable tasting experiences.\n\nChoose a destination above, or ask me anything.",
 },
 ua:{
-tag:"Кожна подорож — новий келих",
+tag:"Кожен келих — це нова подорож",
 sub:"Відкривай винні маршрути, приховані виноградники та незабутні дегустації.",
 choose:"Оберіть напрямок",or:"АБО ЗАПИТАЙ БУДЬ-ЩО",chat:"Чат з Діонісією",
 back:"Назад",dest:"Напрямки",fam:"Відомі маршрути",hid:"Приховані перлини",
