@@ -8,6 +8,9 @@ const CARD="rgba(196,154,90,0.07)",CARD2="rgba(196,154,90,0.13)";
 const B="rgba(196,154,90,0.2)",B2="rgba(196,154,90,0.5)";
 const BTN="linear-gradient(135deg,#3a1020,#5a2030)";
 
+// Google Analytics helper — safe no-op if gtag isn't loaded yet
+const gaEvent=(name,params)=>{try{if(typeof window!=="undefined"&&window.gtag){window.gtag("event",name,params||{});}}catch(e){}};
+
 const CIMG={
 HR:"https://images.unsplash.com/photo-1693149864297-e44de7849c51?auto=format&fit=crop&w=1200&q=80",
 CZ:"https://images.unsplash.com/photo-1658052829392-fd70d474482c?auto=format&fit=crop&w=1200&q=80",
@@ -344,7 +347,7 @@ style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12
 <div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{route.n}</div>
 <div style={{fontSize:12,color:ACCENT,letterSpacing:"0.08em",marginBottom:10,textTransform:"uppercase",fontWeight:500}}>{route.s}</div>
 <div style={{fontSize:14,color:MUTED,lineHeight:1.75,marginBottom:12,fontWeight:500}}>{route.d}</div>
-<button onClick={()=>onAsk("Tell me more about "+route.n+". What should I know before visiting?")}
+<button onClick={()=>{gaEvent("ask_route",{route_name:route.n});onAsk("Tell me more about "+route.n+". What should I know before visiting?");}}
 style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
@@ -367,6 +370,14 @@ const [popup,setPopup]=useState(null);
 const endRef=useRef(null);
 
 useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,load]);
+
+// Track virtual pageviews per screen so GA4 shows time-on-page and exit page per section
+useEffect(()=>{
+let path="/",title="Home";
+if(view==="country"&&country){path="/country/"+country.code;title="Country – "+country.name;}
+else if(view==="chat"){path=country?("/country/"+country.code+"/chat"):"/chat";title="Chat";}
+gaEvent("page_view",{page_path:path,page_title:title,page_location:(typeof window!=="undefined"?window.location.origin:"")+path});
+},[view,country]);
 
 const send=async(text)=>{
 const ut=text||inp.trim();
@@ -432,7 +443,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 <p style={{color:DIM,fontSize:12,letterSpacing:"0.3em",textTransform:"uppercase",textAlign:"center",marginBottom:14,fontWeight:600}}>{t.choose}</p>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12,marginBottom:28}}>
 {COUNTRIES.map(c=>(
-<button key={c.code} onClick={()=>{setCountry(c);setTab("famous");setView("country");}}
+<button key={c.code} onClick={()=>{gaEvent("select_country",{country_name:c.name});setCountry(c);setTab("famous");setView("country");}}
 style={{backgroundImage:"linear-gradient(rgba(26,8,16,0.35),rgba(26,8,16,0.88)),url("+CIMG[c.code]+")",backgroundSize:"cover",backgroundPosition:"center",border:"1px solid "+B,borderRadius:12,padding:"18px 12px",cursor:"pointer",textAlign:"center",color:TEXT,transition:"all 0.2s",minHeight:120}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;}}
@@ -470,7 +481,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 {regs.length>0&&(
 <div style={{display:"flex",flexWrap:"wrap",gap:8,justifyContent:"center",marginBottom:20}}>
 {regs.map((r,i)=>(
-<span key={i} onClick={()=>setPopup(r)}
+<span key={i} onClick={()=>{gaEvent("view_region",{region_name:r.n,country_name:country?.name});setPopup(r);}}
 style={{fontSize:13,color:ACCENT,border:"1px solid rgba(196,154,90,0.3)",borderRadius:20,padding:"5px 14px",cursor:"pointer",transition:"all 0.2s",fontFamily:"'Raleway',sans-serif",fontWeight:500}}
 onMouseOver={e=>{e.currentTarget.style.background="rgba(196,154,90,0.15)";e.currentTarget.style.borderColor=B2;}}
 onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="rgba(196,154,90,0.3)";}}
