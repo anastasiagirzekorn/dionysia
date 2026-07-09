@@ -323,7 +323,7 @@ if (!item) return null;
 return (
 <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:100,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
 <div onClick={e=>e.stopPropagation()} style={{background:BG,border:"1px solid rgba(196,154,90,0.35)",borderRadius:16,maxWidth:480,width:"100%",position:"relative",overflow:"hidden"}}>
-{img&&<div style={{height:160,backgroundImage:"url("+img+")",backgroundSize:"cover",backgroundPosition:"center"}}/>}
+{img&&<div style={{height:260,backgroundImage:"url("+img+")",backgroundSize:"cover",backgroundPosition:"center"}}/>}
 <button onClick={onClose} style={{position:"absolute",top:14,right:16,background:img?"rgba(10,4,8,0.55)":"none",border:"none",color:img?TEXT:ACCENT,cursor:"pointer",fontSize:22,lineHeight:1,borderRadius:"50%",width:32,height:32}}>x</button>
 <div style={{padding:"28px 26px"}}>
 <div style={{fontSize:21,fontWeight:700,color:TEXT,marginBottom:6}}>{item.n}</div>
@@ -339,9 +339,9 @@ function Card({route,label,onAsk,img}) {
 const [hov,setHov]=useState(false);
 return (
 <div onMouseOver={()=>setHov(true)} onMouseOut={()=>setHov(false)}
-style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12,marginBottom:12,overflow:"hidden",transition:"all 0.2s"}}>
+style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12,marginBottom:16,overflow:"hidden",transition:"all 0.2s"}}>
 {img?
-<div style={{height:110,backgroundImage:"url("+img+")",backgroundSize:"cover",backgroundPosition:"center"}}/>
+<div style={{height:220,backgroundImage:"url("+img+")",backgroundSize:"cover",backgroundPosition:"center",transition:"transform 0.3s",transform:hov?"scale(1.04)":"scale(1)"}}/>
 :<div style={{height:3,background:"linear-gradient(90deg,#7a1830,"+ACCENT+",transparent)"}}/>}
 <div style={{padding:"14px 18px 16px"}}>
 <div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{route.n}</div>
