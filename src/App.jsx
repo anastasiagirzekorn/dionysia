@@ -441,16 +441,16 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 <div>
 <p style={{textAlign:"center",color:MUTED,fontSize:15,fontStyle:"italic",lineHeight:1.85,margin:"8px 0 24px",fontWeight:400}}>{t.sub}</p>
 <p style={{color:DIM,fontSize:12,letterSpacing:"0.3em",textTransform:"uppercase",textAlign:"center",marginBottom:14,fontWeight:600}}>{t.choose}</p>
-<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:12,marginBottom:28}}>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginBottom:28}}>
 {COUNTRIES.map(c=>(
 <button key={c.code} onClick={()=>{gaEvent("select_country",{country_name:c.name});setCountry(c);setTab("famous");setView("country");}}
-style={{backgroundImage:"linear-gradient(rgba(26,8,16,0.35),rgba(26,8,16,0.88)),url("+CIMG[c.code]+")",backgroundSize:"cover",backgroundPosition:"center",border:"1px solid "+B,borderRadius:12,padding:"18px 12px",cursor:"pointer",textAlign:"center",color:TEXT,transition:"all 0.2s",minHeight:120}}
-onMouseOver={e=>{e.currentTarget.style.borderColor=B2;}}
-onMouseOut={e=>{e.currentTarget.style.borderColor=B;}}
+style={{backgroundImage:"linear-gradient(180deg,rgba(26,8,16,0.05) 0%,rgba(26,8,16,0.1) 45%,rgba(26,8,16,0.55) 75%,rgba(26,8,16,0.92) 100%),url("+CIMG[c.code]+")",backgroundSize:"cover",backgroundPosition:"center",border:"1px solid "+B,borderRadius:14,padding:"20px 16px",cursor:"pointer",textAlign:"center",color:TEXT,transition:"all 0.2s",minHeight:230,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}
+onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.transform="scale(1.02)";}}
+onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.transform="scale(1)";}}
 >
-<div style={{fontSize:28,marginBottom:8}}>{c.flag}</div>
-<div style={{fontSize:14,fontWeight:600}}>{c.name}</div>
-<div style={{fontSize:12,color:DIM,marginTop:5,lineHeight:1.4}}>{c.region}</div>
+<div style={{fontSize:36,marginBottom:8,filter:"drop-shadow(0 2px 6px rgba(0,0,0,0.6))"}}>{c.flag}</div>
+<div style={{fontSize:18,fontWeight:700,textShadow:"0 1px 4px rgba(0,0,0,0.7)"}}>{c.name}</div>
+<div style={{fontSize:13,color:"#e0c8a8",marginTop:6,lineHeight:1.4,textShadow:"0 1px 4px rgba(0,0,0,0.8)"}}>{c.region}</div>
 </button>
 ))}
 </div>
