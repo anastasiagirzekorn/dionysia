@@ -631,11 +631,15 @@ onMouseOut={e=>{e.currentTarget.style.background="rgba(196,154,90,0.12)";}}
 );
 }
 
-function WineryCard({w,onAsk,label,visitLabel}) {
+function WineryCard({w,onAsk,label,visitLabel,img}) {
 const [hov,setHov]=useState(false);
 return (
 <div onMouseOver={()=>setHov(true)} onMouseOut={()=>setHov(false)}
-style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12,marginBottom:16,transition:"all 0.2s",padding:"14px 18px 16px"}}>
+style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12,marginBottom:16,overflow:"hidden",transition:"all 0.2s"}}>
+{img?
+<div style={{height:180,backgroundImage:"url("+img+")",backgroundSize:"cover",backgroundPosition:"center",transition:"transform 0.3s",transform:hov?"scale(1.04)":"scale(1)"}}/>
+:<div style={{height:3,background:"linear-gradient(90deg,#7a1830,"+ACCENT+",transparent)"}}/>}
+<div style={{padding:"14px 18px 16px"}}>
 <div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{w.n}</div>
 <div style={{fontSize:12,color:ACCENT,letterSpacing:"0.08em",marginBottom:10,textTransform:"uppercase",fontWeight:500}}>{w.loc}</div>
 <div style={{fontSize:14,color:MUTED,lineHeight:1.75,marginBottom:12,fontWeight:500}}>{w.d}</div>
@@ -652,6 +656,7 @@ style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14p
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
 >{label} →</button>
+</div>
 </div>
 </div>
 );
@@ -876,7 +881,11 @@ onWineries={regionIdx!=null?()=>{gaEvent("view_wineries",{region_name:regs[regio
 <span style={{fontSize:22,color:TEXT,fontWeight:600}}>{regs[wineryIdx]?.n}</span>
 </div>
 </div>
-{wineryList.map((w,i)=><WineryCard key={i} w={w} onAsk={send} label={t.ask} visitLabel={t.visit}/>)}
+{wineryList.map((w,i)=>{
+const pool=RIMG[country.code]||[CIMG[country.code]];
+const img=pool[(i+wineryIdx)%pool.length]||CIMG[country.code];
+return <WineryCard key={i} w={w} onAsk={send} label={t.ask} visitLabel={t.visit} img={img}/>;
+})}
 </div>
 )}
 
