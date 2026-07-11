@@ -657,7 +657,19 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 );
 }
 
-function Card({route,label,onAsk,img}) {
+// Maps each route (by index, same order as R[country]/RUA[country]) to its matching
+// region index in REG[country]/REGUA[country] — null when no region covers that route.
+const ROUTE_REGION_MAP={
+HR:[2,1,0,null,null],
+CZ:[0,2,0,1],
+FR:[0,1,2,null,null],
+IT:[0,1,2,null,null],
+PT:[0,1,2,null,null],
+ES:[0,1,null,2,null],
+UA:[0,1,2,0,0,null],
+};
+
+function Card({route,label,onAsk,img,onWineries,wineriesLabel}) {
 const [hov,setHov]=useState(false);
 return (
 <div onMouseOver={()=>setHov(true)} onMouseOut={()=>setHov(false)}
@@ -669,11 +681,20 @@ style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12
 <div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{route.n}</div>
 <div style={{fontSize:12,color:ACCENT,letterSpacing:"0.08em",marginBottom:10,textTransform:"uppercase",fontWeight:500}}>{route.s}</div>
 <div style={{fontSize:14,color:MUTED,lineHeight:1.75,marginBottom:12,fontWeight:500}}>{route.d}</div>
+<div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
 <button onClick={()=>{gaEvent("ask_route",{route_name:route.n});onAsk("Tell me more about "+route.n+". What should I know before visiting?");}}
 style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
 >{label} →</button>
+{onWineries&&(
+<button onClick={onWineries}
+style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
+onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
+onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
+>🍇 {wineriesLabel} →</button>
+)}
+</div>
 </div>
 </div>
 );
@@ -832,7 +853,13 @@ onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.s
 <button style={TB(tab==="famous")} onClick={()=>setTab("famous")}>🗺️ {t.fam}</button>
 <button style={TB(tab==="hidden")} onClick={()=>setTab("hidden")}>💎 {t.hid}</button>
 </div>
-{shown.map((r,i)=><Card key={i} route={r} label={t.ask} onAsk={send} img={RIMG[country.code]?.[routes.indexOf(r)]||CIMG[country.code]}/>)}
+{shown.map((r,i)=>{
+const rIdx=routes.indexOf(r);
+const regionIdx=ROUTE_REGION_MAP[country.code]?.[rIdx];
+return <Card key={i} route={r} label={t.ask} onAsk={send} img={RIMG[country.code]?.[rIdx]||CIMG[country.code]}
+wineriesLabel={t.wineries}
+onWineries={regionIdx!=null?()=>{gaEvent("view_wineries",{region_name:regs[regionIdx]?.n,country_name:country.name});setWineryIdx(regionIdx);setView("wineries");}:null}/>;
+})}
 <div style={{display:"flex",alignItems:"center",gap:12,margin:"8px 0 14px"}}>
 <div style={{flex:1,height:1,background:B}}/>
 <span style={{color:DIM,fontSize:12,letterSpacing:"0.2em",fontWeight:600}}>{t.or}</span>
