@@ -320,6 +320,26 @@ UA:[
 ],
 };
 
+// Real photos hotlinked directly from each winery's own official website (keyed by
+// their website URL, so it works for both language versions). Only included where a
+// genuine photo (not a logo/icon/sketch) was confirmed — otherwise falls back to a
+// generic regional photo.
+const WINERY_PHOTOS={
+"https://www.meneghetti.hr":"https://meneghetti.hr/wp-content/uploads/2026/03/DJI_0238.jpg",
+"https://matusko-vina.hr/en/":"https://matusko-vina.hr/wp-content/uploads/2021/04/www.bakovicphoto.com-57-scaled.jpg",
+"https://www.chateau-meursault.com/":"https://www.chateau-meursault.com/wp-content/uploads/2022/04/Visuel-RS-1.jpg",
+"https://www.chateau-palmer.com/":"https://cdn.prod.website-files.com/63a417a748979747a3239e66/63ef64b43229e5eae4466149_chateaupalmer-OG-image.png",
+"https://www.lafite.com/domaines/rieussec/":"https://www.lafite.com/wp-content/uploads/2023/02/Domaine-Rieussec-Danon-Boileau-7-scaled.jpg",
+"https://www.trimbach.fr/":"https://static.wixstatic.com/media/03bc04_2bc937bbbe7b40c1b280407f554c844d~mv2.jpg/v1/fit/w_2500,h_1330,al_c/03bc04_2bc937bbbe7b40c1b280407f554c844d~mv2.jpg",
+"https://castellodiama.com/en/":"https://www.datocms-assets.com/11287/1622188496-oborgoelicottero2.jpg",
+"https://www.fontodi.com/en/":"https://www.fontodi.com/images/Home_fontodi.jpg",
+"https://www.quintadocrasto.wine/en/":"https://www.quintadocrasto.wine/wp-content/uploads/2025/02/site-image.webp",
+"https://esporao.com/en":"https://esporao.com/media/pages/medialibrary/9ca0045120-1693840899/alentejo-vinhas-1-1200x-q85.jpg",
+"https://soalheiro.com/en":"https://soalheiro.com/cdn/shop/files/04-SET-2023-44-scaled_acf91849-8a7a-4ced-ab0f-ed82c3edd4ed.jpg?v=1770413119&width=2048",
+"https://www.bodegasprotos.com/en/architecture/":"https://www.bodegasprotos.com/wp-content/uploads/2019/04/Richard-Rogers.webp",
+"https://chizay.com/en/":"https://chizay.com/wp-content/uploads/2021/08/0002.jpg",
+};
+
 // Real wineries per region (same order as REG[country] / REGUA[country])
 const WINERIES={
 HR:[
@@ -883,7 +903,7 @@ onWineries={regionIdx!=null?()=>{gaEvent("view_wineries",{region_name:regs[regio
 </div>
 {wineryList.map((w,i)=>{
 const pool=RIMG[country.code]||[CIMG[country.code]];
-const img=pool[(i+wineryIdx)%pool.length]||CIMG[country.code];
+const img=(w.url&&WINERY_PHOTOS[w.url])||pool[(i+wineryIdx)%pool.length]||CIMG[country.code];
 return <WineryCard key={i} w={w} onAsk={send} label={t.ask} visitLabel={t.visit} img={img}/>;
 })}
 </div>
