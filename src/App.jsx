@@ -93,6 +93,7 @@ choose:"Choose a destination",or:"OR ASK ANYTHING",chat:"Chat with Dionysia",
 back:"Back",dest:"Destinations",fam:"Famous routes",hid:"Hidden gems",
 bt:"Best time to visit",peak:"Peak",good:"Good",avoid:"Avoid",
 book:"Book your stay",
+searchHotels:"Or search hotels directly",
 ask:"Ask Dionysia",newc:"New chat",ph:"Ask about wine regions, routes...",
 pour:"Pouring knowledge...",
 welcome:"Welcome to Dionysia 🍷\n\nI'm your personal wine travel guide — here to help you discover iconic wine routes, hidden vineyards, and unforgettable tasting experiences.\n\nChoose a destination above, or ask me anything.",
@@ -104,6 +105,7 @@ choose:"Оберіть напрямок",or:"АБО ЗАПИТАЙ БУДЬ-ЩО
 back:"Назад",dest:"Напрямки",fam:"Відомі маршрути",hid:"Приховані перлини",
 bt:"Найкращий час",peak:"Пік",good:"Добре",avoid:"Уникай",
 book:"Забронювати проживання",
+searchHotels:"Або шукайте готелі напряму",
 ask:"Запитати",newc:"Новий чат",ph:"Запитай про винні маршрути...",
 pour:"Наливаємо знання...",
 welcome:"Ласкаво просимо до Діонісії 🍷\n\nЯ твій особистий гід у світі винного туризму — допоможу відкрити знакові маршрути, приховані виноградники і незабутні дегустації.\n\nОбери напрямок вище або просто запитай.",
@@ -372,6 +374,38 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 );
 }
 
+// Official Booking.com Affiliate Widget (interactive search box) — via CJ, Dionysia Website ID 101823415
+function BookingWidget() {
+const ref = useRef(null);
+useEffect(() => {
+const id = "bookingAffiliateWidget_dionysia_home";
+if (ref.current) ref.current.id = id;
+const init = () => {
+if (window.Booking && window.Booking.AffiliateWidget) {
+new window.Booking.AffiliateWidget({
+iframeSettings: { selector: id, responsive: true },
+widgetSettings: { destinationurloverride: "http://www.jdoqocy.com/click-101823415-17323521?sid=" },
+});
+}
+};
+if (window.Booking && window.Booking.AffiliateWidget) {
+init();
+} else {
+const existing = document.getElementById("booking-affiliate-sdk");
+if (existing) {
+existing.addEventListener("load", init);
+} else {
+const s = document.createElement("script");
+s.id = "booking-affiliate-sdk";
+s.src = "https://www.booking.com/affiliate/prelanding_sdk";
+s.onload = init;
+document.body.appendChild(s);
+}
+}
+}, []);
+return <div ref={ref} style={{ minHeight: 80 }} />;
+}
+
 export default function App() {
 const [lang,setLang]=useState("en");
 const t=T[lang];
@@ -469,6 +503,13 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.transf
 </button>
 ))}
 </div>
+
+{/* Booking.com search widget — official SDK, via CJ affiliate */}
+<p style={{color:DIM,fontSize:12,letterSpacing:"0.3em",textTransform:"uppercase",textAlign:"center",marginBottom:14,fontWeight:600}}>🏨 {t.searchHotels}</p>
+<div style={{border:"1px solid "+B,borderRadius:12,overflow:"hidden",marginBottom:28,padding:2}}>
+<BookingWidget/>
+</div>
+
 <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
 <div style={{flex:1,height:1,background:B}}/>
 <span style={{color:DIM,fontSize:12,letterSpacing:"0.2em",fontWeight:600}}>{t.or}</span>
