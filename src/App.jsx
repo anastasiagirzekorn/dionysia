@@ -92,10 +92,10 @@ sub:"Explore wine routes, hidden vineyards, and unforgettable tasting experience
 choose:"Choose a destination",or:"OR ASK ANYTHING",chat:"Chat with Dionysia",
 back:"Back",dest:"Destinations",fam:"Famous routes",hid:"Hidden gems",
 bt:"Best time to visit",peak:"Peak",good:"Good",avoid:"Avoid",
+book:"Book your stay",
 ask:"Ask Dionysia",newc:"New chat",ph:"Ask about wine regions, routes...",
 pour:"Pouring knowledge...",
 welcome:"Welcome to Dionysia 🍷\n\nI'm your personal wine travel guide — here to help you discover iconic wine routes, hidden vineyards, and unforgettable tasting experiences.\n\nChoose a destination above, or ask me anything.",
-wineries:"Region Wineries",visit:"Visit website",
 },
 ua:{
 tag:"Кожен келих — це нова подорож",
@@ -103,10 +103,10 @@ sub:"Відкривай винні маршрути, приховані вино
 choose:"Оберіть напрямок",or:"АБО ЗАПИТАЙ БУДЬ-ЩО",chat:"Чат з Діонісією",
 back:"Назад",dest:"Напрямки",fam:"Відомі маршрути",hid:"Приховані перлини",
 bt:"Найкращий час",peak:"Пік",good:"Добре",avoid:"Уникай",
+book:"Забронювати проживання",
 ask:"Запитати",newc:"Новий чат",ph:"Запитай про винні маршрути...",
 pour:"Наливаємо знання...",
 welcome:"Ласкаво просимо до Діонісії 🍷\n\nЯ твій особистий гід у світі винного туризму — допоможу відкрити знакові маршрути, приховані виноградники і незабутні дегустації.\n\nОбери напрямок вище або просто запитай.",
-wineries:"Винарні регіону",visit:"Сайт",
 },
 };
 
@@ -119,6 +119,19 @@ const COUNTRIES=[
 {code:"ES",name:"Spain",flag:"🇪🇸",region:"Rioja · Ribera · Priorat"},
 {code:"UA",name:"Ukraine",flag:"🇺🇦",region:"Zakarpattia · Odesa · Bessarabia"},
 ];
+
+// Booking.com affiliate integration (via CJ Affiliate — Dionysia Website ID 101823415)
+const CJ_ID = "101823415-15735418";
+const bookingLink = (dest) => `https://www.tkqlhce.com/click-${CJ_ID}?url=${encodeURIComponent(dest)}`;
+const BOOKING_DEST = {
+HR:"https://www.booking.com/searchresults.html?ss=Croatia",
+CZ:"https://www.booking.com/searchresults.html?ss=Czech%20Republic",
+FR:"https://www.booking.com/searchresults.html?ss=France",
+IT:"https://www.booking.com/searchresults.html?ss=Italy",
+PT:"https://www.booking.com/searchresults.html?ss=Portugal",
+ES:"https://www.booking.com/searchresults.html?ss=Spain",
+UA:"https://www.booking.com/searchresults.html?ss=Ukraine",
+};
 
 const R={
 HR:[
@@ -320,314 +333,7 @@ UA:[
 ],
 };
 
-// Real photos hotlinked directly from each winery's own official website (keyed by
-// their website URL, so it works for both language versions). Only included where a
-// genuine photo (not a logo/icon/sketch) was confirmed — otherwise falls back to a
-// generic regional photo.
-const WINERY_PHOTOS={
-"https://www.meneghetti.hr":"https://meneghetti.hr/wp-content/uploads/2026/03/DJI_0238.jpg",
-"https://matusko-vina.hr/en/":"https://matusko-vina.hr/wp-content/uploads/2021/04/www.bakovicphoto.com-57-scaled.jpg",
-"https://www.chateau-meursault.com/":"https://www.chateau-meursault.com/wp-content/uploads/2022/04/Visuel-RS-1.jpg",
-"https://www.chateau-palmer.com/":"https://cdn.prod.website-files.com/63a417a748979747a3239e66/63ef64b43229e5eae4466149_chateaupalmer-OG-image.png",
-"https://www.lafite.com/domaines/rieussec/":"https://www.lafite.com/wp-content/uploads/2023/02/Domaine-Rieussec-Danon-Boileau-7-scaled.jpg",
-"https://www.trimbach.fr/":"https://static.wixstatic.com/media/03bc04_2bc937bbbe7b40c1b280407f554c844d~mv2.jpg/v1/fit/w_2500,h_1330,al_c/03bc04_2bc937bbbe7b40c1b280407f554c844d~mv2.jpg",
-"https://castellodiama.com/en/":"https://www.datocms-assets.com/11287/1622188496-oborgoelicottero2.jpg",
-"https://www.fontodi.com/en/":"https://www.fontodi.com/images/Home_fontodi.jpg",
-"https://www.quintadocrasto.wine/en/":"https://www.quintadocrasto.wine/wp-content/uploads/2025/02/site-image.webp",
-"https://esporao.com/en":"https://esporao.com/media/pages/medialibrary/9ca0045120-1693840899/alentejo-vinhas-1-1200x-q85.jpg",
-"https://soalheiro.com/en":"https://soalheiro.com/cdn/shop/files/04-SET-2023-44-scaled_acf91849-8a7a-4ced-ab0f-ed82c3edd4ed.jpg?v=1770413119&width=2048",
-"https://www.bodegasprotos.com/en/architecture/":"https://www.bodegasprotos.com/wp-content/uploads/2019/04/Richard-Rogers.webp",
-"https://chizay.com/en/":"https://chizay.com/wp-content/uploads/2021/08/0002.jpg",
-};
-
-// Real wineries per region (same order as REG[country] / REGUA[country])
-const WINERIES={
-HR:[
-[
-{n:"Stina Winery",loc:"Bol, island of Brač",d:"Housed in a 1903 stone building on the seafront, growing indigenous Plavac Mali, Pošip and Vugava on extreme rocky terrain.",url:null},
-{n:"Testament Winery",loc:"Vrgorac/Podgora area",d:"Ages some of its wine underwater in the Adriatic and pours tastings from a hillside room over its organic vineyard.",url:null},
-{n:"Lacman Winery",loc:"Selca, Hvar island",d:"Family-run estate serving tastings on a wooden deck overlooking Stari Grad Bay.",url:null},
-{n:"Crvik Winery",loc:"Hvar island",d:"Third-generation producer of 'Tesoro', a white made from the native Malvazija Dubrovačka grape.",url:null},
-],
-[
-{n:"Kozlović Winery",loc:"Momjan",d:"Family-run since 1904 near the Slovenian border, celebrated for Malvazija Istarska, Teran and Muscat Momiano.",url:"https://www.kozlovic.hr/en/"},
-{n:"Kabola Winery",loc:"Momjan",d:"Blends ancient qvevri (amphora) winemaking with Istrian terroir for standout Malvazija and Teran.",url:"https://www.kabola.hr"},
-{n:"Benvenuti Winery",loc:"Kaldir, near Motovun",d:"The leading estate of the Motovun growing area, producing indigenous Istrian whites and reds.",url:null},
-{n:"Meneghetti Wine Hotel & Winery",loc:"Bale",d:"A design-forward wine resort among vineyards and olive groves, pouring several styles of Malvazija.",url:"https://www.meneghetti.hr"},
-],
-[
-{n:"Matuško Winery",loc:"Potomje",d:"A 2,000m² underground cellar drawing 50,000+ visitors a year for its Dingač-appellation Plavac Mali.",url:"https://matusko-vina.hr/en/"},
-{n:"Bura-Mrgudić Winery",loc:"Potomje",d:"A small five-generation family estate hand-farming the steep Dingač and Postup slopes.",url:"https://mokalo.hr/en"},
-{n:"Saints Hills Winery",loc:"Oskorušno",d:"A stone winery revived in 2011, working with star oenologist Michel Rolland on Dingač-appellation wines.",url:"https://saintshills.com/"},
-{n:"Vinarija Miloš",loc:"Ponikve",d:"A historic multi-generation family estate whose Dingač and Postup wines are benchmarks of the appellation.",url:null},
-],
-],
-CZ:[
-[
-{n:"Sonberk",loc:"Popice, near Mikulov",d:"A striking 2008 winery building with iconic views over the Pálava Hills.",url:"https://www.sonberk.cz/en/"},
-{n:"Vinselekt Michlovský",loc:"Rakvice",d:"Farms 125 hectares across Velké Pavlovice and Mikulov and won the first-ever Czech Winery of the Year award.",url:"https://www.michlovsky.com/en/"},
-{n:"Château Mělník (Lobkowicz)",loc:"Mělník",d:"The Lobkowicz family has held these vineyards since 1753; tour medieval cellars while tasting the signature 'Ludmila'.",url:"https://lobkowicz-melnik.cz/en/"},
-{n:"Wine Salon of the Czech Republic",loc:"Valtice chateau cellars",d:"The country's official showcase, where the year's 100 best Czech and Moravian wines can be tasted together.",url:null},
-],
-[
-{n:"Johann W",loc:"Třebívlice",d:"One of Bohemia's oldest wine estates, its label honoring Ulrike von Levetzow, the last love of the poet Goethe.",url:"https://johannw.com/en/"},
-{n:"Porta Bohemica",loc:"Velké Žernoseky",d:"Established 2010 on volcanic hills of the Central Bohemian Uplands along the Elbe, specializing in dry whites.",url:null},
-{n:"Vinařství Kraus",loc:"Mělník",d:"Founded by Prof. Vilém Kraus, regarded as the father of modern Czech winemaking.",url:null},
-{n:"Chateau Mělník Winery",loc:"Mělník",d:"Farms 23 hectares across six vineyards for 30,000–40,000 bottles a year of Pinot Noir and Müller-Thurgau.",url:null},
-],
-[
-{n:"Znovín Znojmo",loc:"Louka Monastery, Znojmo",d:"The country's largest wine producer, ageing near a million bottles in a former monastery's medieval cellars.",url:"https://www.znovin.cz"},
-{n:"Lahofer Winery",loc:"Dobšice",d:"A wave-shaped modern winery with a hand-painted tasting-room mural and a rooftop terrace.",url:"https://www.lahofer.cz"},
-{n:"Šobes Vineyard",loc:"bend of the Dyje River",d:"One of Central Europe's oldest and most acclaimed vineyard sites, its steep river-bend terraces prized for Riesling and Pálava.",url:null},
-{n:"Vinné sklepy Šatov",loc:"Šatov, on the Austrian border",d:"A historic underground cellar complex showcasing Znojmo's Grüner Veltliner and Müller-Thurgau.",url:null},
-],
-],
-FR:[
-[
-{n:"Château de Pommard",loc:"Pommard",d:"Built in 1726 and farmed biodynamically, one of the most-visited estates in the Côte-d'Or.",url:"https://www.chateaudepommard.com/"},
-{n:"Domaine Faiveley",loc:"Nuits-Saint-Georges",d:"Family-owned since 1825 and the largest vineyard holder in the appellation, known for Premier Cru 'Les Saint-Georges'.",url:"https://domaine-faiveley.com/"},
-{n:"Château de Meursault",loc:"Meursault",d:"Stone-vaulted cellars from the 12th, 14th and 16th centuries hold 800,000 bottles beneath the château.",url:"https://www.chateau-meursault.com/"},
-{n:"Domaine Marquis d'Angerville",loc:"Volnay",d:"One of Volnay's oldest estates (first recorded 1507), famous for its Clos des Ducs monopole.",url:null},
-],
-[
-{n:"Château Pichon Longueville Baron",loc:"Pauillac",d:"A Second Growth reopened to the public in 2023, offering by-appointment tours with vertical tastings.",url:"https://www.pichonbaron.com/"},
-{n:"Château Smith Haut Lafitte",loc:"Martillac",d:"A Cru Classé estate known for its vineyard spa and art-and-nature tours.",url:"https://www.smith-haut-lafitte.com/"},
-{n:"Château Palmer",loc:"Margaux-Cantenac",d:"A Third Growth behind a distinctive four-turreted château, fully biodynamic-certified since 2018.",url:"https://www.chateau-palmer.com/"},
-{n:"Château Rieussec",loc:"Fargues, Sauternes",d:"A Premier Cru Classé Sauternes estate owned by the Rothschilds of Lafite, with guided cellar visits by appointment.",url:"https://www.lafite.com/domaines/rieussec/"},
-],
-[
-{n:"Domaine Zind-Humbrecht",loc:"Turckheim",d:"Growing vines since 1620 and biodynamic since 1997, farming Grand Cru parcels in Rangen, Goldert, Hengst and Brand.",url:"https://www.zindhumbrecht.fr/"},
-{n:"Domaine Weinbach",loc:"Kaysersberg",d:"Founded in 1612 by Capuchin monks at the foot of the Schlossberg Grand Cru, renowned for Riesling and Gewürztraminer.",url:"https://www.domaineweinbach.com/"},
-{n:"Maison Trimbach",loc:"Ribeauvillé",d:"Producer of Clos Sainte-Hune, a tiny monopole considered one of the world's greatest dry Rieslings.",url:"https://www.trimbach.fr/"},
-{n:"Domaine Marcel Deiss",loc:"Bergheim",d:"A biodynamic estate reviving 'complantation' — interplanting multiple grape varieties in a single Grand Cru parcel.",url:"https://www.marceldeiss.com/"},
-],
-],
-IT:[
-[
-{n:"Castello di Ama",loc:"Gaiole in Chianti",d:"A 12th-century estate whose 1998 cellar restoration launched a contemporary art collection set among the vineyards.",url:"https://castellodiama.com/en/"},
-{n:"Fontodi",loc:"Panzano in Chianti",d:"A certified-organic estate whose 100% Sangiovese 'Flaccianello' has repeatedly ranked among the world's top wines.",url:"https://www.fontodi.com/en/"},
-{n:"Poliziano",loc:"Montepulciano",d:"A founding modern estate of Vino Nobile, farming 170 hectares organically around the local 'Prugnolo Gentile' clone.",url:"https://carlettipoliziano.com/en/"},
-{n:"Tenuta San Guido (Sassicaia)",loc:"Bolgheri",d:"The original Super Tuscan estate that launched Bolgheri's wine revolution in the 1960s–70s.",url:null},
-],
-[
-{n:"Marchesi di Barolo",loc:"Barolo",d:"The oldest, most historic Barolo producer, with underground cellars and guided Barolo and Barbaresco tastings.",url:"https://marchesibarolo.com/en/"},
-{n:"Ceretto",loc:"Alba/Langhe",d:"Famous for the 'Cappella del Barolo', a deconsecrated church turned art landmark in the Brunate vineyard.",url:"https://www.ceretto.com"},
-{n:"Vietti",loc:"Castiglione Falletto",d:"Created one of Barolo's first single-vineyard crus in the 1950s and Piedmont's first single-variety Roero Arneis.",url:"https://www.vietti.com/en/"},
-{n:"Produttori del Barbaresco",loc:"Barbaresco",d:"A historic 1894 grower cooperative of 53 members working exclusively with Nebbiolo.",url:null},
-],
-[
-{n:"Tenuta delle Terre Nere",loc:"Randazzo, Mount Etna",d:"Founded by a pioneer of modern Etna winemaking, first to bottle single-vineyard 'contrada' wines from the north slope.",url:"https://www.tenutaterrenere.com"},
-{n:"Girolamo Russo",loc:"Passopisciaro, Mount Etna",d:"A 15-hectare estate at 650–780m altitude known for its single-vineyard 'Cru' bottlings.",url:"https://www.girolamorusso.it/?lang=en"},
-{n:"Donnafugata",loc:"Marsala",d:"Family-owned for over a century, its 1851 cellars in a traditional Sicilian 'baglio' host tastings of native-grape wines.",url:"https://visit.donnafugata.it/en/"},
-{n:"Florio",loc:"Marsala",d:"Founded 1832, the historic house behind fortified Marsala wine, with a private collection of 40,000+ historic bottles.",url:null},
-],
-],
-PT:[
-[
-{n:"Quinta do Bomfim",loc:"Pinhão",d:"Dow's Port flagship estate, with a riverside 1896 lodge and lagares engineered to replicate foot-treading.",url:"https://www.symington.com/visitar/quinta-do-bomfim/"},
-{n:"Quinta do Seixo (Sandeman)",loc:"Valença do Douro",d:"Sandeman's 100-hectare flagship, pairing an 18th-century manor with a hillside winery and robotic lagares.",url:"https://www.sandeman.com/port-wine/visit/quinta-do-seixo-douro/"},
-{n:"Quinta das Carvalhas",loc:"near Pinhão",d:"Known as 'the image of the Douro' for its dramatic terraces and 360-degree views from the hilltop Casa Redonda.",url:null},
-{n:"Quinta do Crasto",loc:"near Sabrosa",d:"Dry-stone terraces up to 400 years old hold vines as old as 90 years on steep schist slopes.",url:"https://www.quintadocrasto.wine/en/"},
-],
-[
-{n:"Herdade do Esporão",loc:"Reguengos de Monsaraz",d:"Documented since the 13th century around a late-Gothic tower, certified as Portugal's first wine tourism destination.",url:"https://esporao.com/en"},
-{n:"Adega da Cartuxa",loc:"Évora",d:"Run by a nonprofit foundation near UNESCO-listed Évora, producer of the acclaimed Pêra-Manca label.",url:"https://www.vinhosdoalentejo.pt/en/producers/fundacao-eugenio-de-almeida-adega-cartuxa/"},
-{n:"Herdade Grande",loc:"Vidigueira",d:"A 350-hectare family estate combining vines and olive groves, offering a 'Vineyards & Vistas' tasting.",url:null},
-{n:"Herdade dos Grous",loc:"near Albernoa",d:"A 1,000-hectare estate named for cranes nesting on its lake, combining vineyards, olive groves and a boutique hotel.",url:null},
-],
-[
-{n:"Quinta de Soalheiro",loc:"Melgaço",d:"Planted the region's first mono-varietal Alvarinho vineyard in 1974, pioneering high-quality Alvarinho.",url:"https://soalheiro.com/en"},
-{n:"Quinta da Aveleda",loc:"Penafiel",d:"Family-owned since 1870, famous for 8 hectares of gardens with free-roaming peacocks and a cellar built in 1850.",url:"https://aveleda.com/en/wine-tourism/quinta-da-aveleda"},
-{n:"Quinta de Santa Cristina",loc:"Cabeceiras de Basto",d:"A hillside estate 400m up, with 30 hectares of vines overlooking the Tâmega river valley.",url:null},
-{n:"Quinta de Lourosa",loc:"Paços de Ferreira area",d:"A highly rated family quinta popular for guided tours and tastings in the Sousa sub-region.",url:null},
-],
-],
-ES:[
-[
-{n:"Bodegas Ysios",loc:"Laguardia",d:"Designed by Santiago Calatrava, its undulating cedar roofline mimics stacked barrels against the Sierra de Cantabria.",url:"https://bodegasysios.com/en/"},
-{n:"Bodegas Marqués de Riscal",loc:"Elciego",d:"Home to Frank Gehry's titanium 'City of Wine' hotel beside the original 1860 bodega.",url:"https://www.marquesderiscal.com/en/the-marques-de-riscal-city-of-wine"},
-{n:"Bodegas Muga",loc:"Haro",d:"Family-run since 1932 and the only Rioja estate that still makes its own oak barrels in-house.",url:"https://www.bodegasmuga.com/en/"},
-{n:"Bodegas Baigorri",loc:"Samaniego",d:"A glass cube above ground conceals seven underground gravity-flow levels descending 32 meters.",url:"https://bodegasbaigorri.com/en/"},
-],
-[
-{n:"Bodegas Vega Sicilia",loc:"Valbuena de Duero",d:"Spain's most legendary winery, founded 1864, producer of the iconic 'Único' reds.",url:"https://www.temposvegasicilia.com/en/terroirniveau1/4/ribera-del-duero"},
-{n:"Bodegas Protos",loc:"Peñafiel",d:"A modern extension by Richard Rogers' firm, its terracotta vaults echoing the medieval castle above it.",url:"https://www.bodegasprotos.com/en/architecture/"},
-{n:"Bodegas Emilio Moro",loc:"Pesquera de Duero",d:"A family winery on vines planted in 1932, known for the acclaimed 'Malleolus' label.",url:"https://www.emiliomoro.com/en/"},
-{n:"Bodegas Arzuaga Navarro",loc:"Quintanilla de Onésimo",d:"Built around a 1,400-hectare estate, pairing vineyard tours with a Michelin-starred restaurant and spa.",url:"https://arzuaganavarro.com/"},
-],
-[
-{n:"Clos Mogador",loc:"Gratallops",d:"Founded 1979 by one of the five founders of the 'Clos' movement that revived Priorat in the late 1980s.",url:null},
-{n:"Celler Vall Llach",loc:"Porrera",d:"Co-founded by Catalan singer-songwriter Lluís Llach, with a museum-like tasting room over slate 'llicorella' terraces.",url:"https://www.vallllach.com/en/"},
-{n:"Mas Doix",loc:"Poboleda",d:"Prized for a plot of 1902-planted Carignan vines and ~80-year-old Garnacha, farmed organically and biodynamically.",url:"https://masdoix.com/en/"},
-{n:"Álvaro Palacios",loc:"Gratallops",d:"Founded 1989 by one of the 'Gratallops Five', producer of L'Ermita from Garnacha vines planted 1900–1940.",url:null},
-],
-],
-UA:[
-[
-{n:"Chateau Chizay",loc:"Chizay valley, near Berehove",d:"Ukraine's first private winery, founded 1995 on a site with winemaking dating to the 13th century, with a wine museum and restaurant.",url:"https://chizay.com/en/"},
-{n:"Parászka Family Cellar",loc:"village of Bene",d:"Run by two brothers cultivating up to 250 grape varieties, tasting in a century-old cave cellar dug by WWI POWs.",url:null},
-{n:"Sass K. Winery",loc:"village of Kígyós (Zmiivka)",d:"A small organic winery on the volcanic Hazanéző hill, growing ~60 traditional Carpathian varieties.",url:null},
-{n:"Leanka",loc:"Serednye",d:"One of the region's oldest wineries (1946), specializing in the indigenous Leanka grape native to the Carpathian Basin.",url:null},
-],
-[
-{n:"Shabo Winery / Wine Culture Center",loc:"village of Shabo",d:"Founded 1822 by Swiss and French colonists, with 200-year-old cellars and a museum on 1,500 years of local winemaking.",url:"https://shabo.ua/en/"},
-{n:"Guliev Wines",loc:"Sarata district",d:"Run by a fourth-generation Georgian winemaking family, with vines planted between the Black Sea coast and the Dniester estuary.",url:null},
-{n:"Artwinery",loc:"relocated to Odesa oblast",d:"One of Europe's largest sparkling wine producers, which relocated its team and 9 million bottles west after its original cellars became a war zone.",url:"https://artwine.com/"},
-{n:"Odessa Sparkling Wine Company",loc:"city of Odesa",d:"A historic sparkling-wine producer within the city, offering tours and tastings of traditional-method sparkling wines.",url:null},
-],
-[
-{n:"Kolonist",loc:"Krynychne village, near Lake Yalpuh",d:"Founded 2005 by descendants of Bulgarian colonists, pioneering the revival of the indigenous Odesa Black grape.",url:"https://kolonist.com.ua/en/"},
-{n:"Bolgrad Winery",loc:"town of Bolhrad",d:"A large-scale winery in a town founded by Bulgarian colonists in 1821, shaped by a Black Sea-influenced microclimate.",url:null},
-{n:"Stoyanov Winery",loc:"city of Kiliya",d:"A family estate founded in 1991, at the southernmost tip of Ukrainian Bessarabia where the Danube meets the sea.",url:null},
-{n:"Wintrest / PAVA",loc:"southern Odesa oblast",d:"A regional producer farming 650 hectares planted between 1998 and 2006.",url:null},
-],
-],
-};
-
-const WINERIESUA={
-HR:[
-[
-{n:"Stina Winery",loc:"Бол, острів Брач",d:"Кам'яна будівля 1903 року на набережній, де вирощують автохтонні Плавац Малі, Пошип і Вугаву на крутих кам'янистих схилах.",url:null},
-{n:"Testament Winery",loc:"район Врґорац/Подгора",d:"Витримує частину вина під водою Адріатики, дегустації проходять у залі на пагорбі над органічним виноградником.",url:null},
-{n:"Lacman Winery",loc:"Сельца, острів Хвар",d:"Сімейна виноробня з дегустаціями на дерев'яній терасі з видом на затоку Старий Град.",url:null},
-{n:"Crvik Winery",loc:"острів Хвар",d:"Виноробня у третьому поколінні, що виробляє біле 'Tesoro' з автохтонного сорту Мальвазія Дубровачка.",url:null},
-],
-[
-{n:"Kozlović Winery",loc:"Мом'ян",d:"Сімейна виноробня з 1904 року біля кордону зі Словенією, відома Мальвазією Істарською, Тераном і Мускатом Мом'яно.",url:"https://www.kozlovic.hr/en/"},
-{n:"Kabola Winery",loc:"Мом'ян",d:"Поєднує давнє виноробство в амфорах (квеврі) з істрійським теруаром для чудової Мальвазії і Терану.",url:"https://www.kabola.hr"},
-{n:"Benvenuti Winery",loc:"Калдір, поблизу Мотовуна",d:"Провідна виноробня зони Мотовун, що виробляє автохтонні істрійські білі та червоні вина.",url:null},
-{n:"Meneghetti Wine Hotel & Winery",loc:"Бале",d:"Стильний винний курорт серед виноградників і оливкових гаїв з кількома стилями Мальвазії.",url:"https://www.meneghetti.hr"},
-],
-[
-{n:"Matuško Winery",loc:"Потомле",d:"Підземний льох 2000м², що приймає понад 50 000 відвідувачів на рік заради Плавац Малі апеласьйону Дінгач.",url:"https://matusko-vina.hr/en/"},
-{n:"Bura-Mrgudić Winery",loc:"Потомле",d:"Невелика родинна виноробня у п'ятому поколінні, що вручну обробляє круті схили Дінгач і Поступ.",url:"https://mokalo.hr/en"},
-{n:"Saints Hills Winery",loc:"Оскорушно",d:"Кам'яна виноробня, відроджена у 2011 році, що працює зі знаним ензологом Мішелем Ролланом над винами Дінгач.",url:"https://saintshills.com/"},
-{n:"Vinarija Miloš",loc:"Понікве",d:"Історична родинна виноробня, чиї вина Дінгач і Поступ є еталоном апеласьйону.",url:null},
-],
-],
-CZ:[
-[
-{n:"Sonberk",loc:"Попіце, поблизу Мікулова",d:"Вражаюча будівля виноробні 2008 року з культовим видом на пагорби Палави.",url:"https://www.sonberk.cz/en/"},
-{n:"Vinselekt Michlovský",loc:"Раквіце",d:"Обробляє 125 гектарів у Велке Павловіце і Мікулові, перший лауреат премії 'Чеська виноробня року'.",url:"https://www.michlovsky.com/en/"},
-{n:"Château Mělník (Lobkowicz)",loc:"Мельнік",d:"Родина Лобковіц володіє цими виноградниками з 1753 року; середньовічні льохи і фірмова 'Людмила'.",url:"https://lobkowicz-melnik.cz/en/"},
-{n:"Wine Salon of the Czech Republic",loc:"льохи замку Валтіце",d:"Офіційна вітрина країни, де можна продегустувати 100 найкращих чеських і моравських вин року.",url:null},
-],
-[
-{n:"Johann W",loc:"Тршебівліце",d:"Одна з найстаріших виноробень Богемії, назва на етикетці на честь Ульріки фон Левецов, останнього кохання Гете.",url:"https://johannw.com/en/"},
-{n:"Porta Bohemica",loc:"Велке Жерносеки",d:"Заснована 2010 року на вулканічних пагорбах над Ельбою, спеціалізується на сухих білих винах.",url:null},
-{n:"Vinařství Kraus",loc:"Мельнік",d:"Заснована професором Вілемом Краусом, якого вважають батьком сучасного чеського виноробства.",url:null},
-{n:"Chateau Mělník Winery",loc:"Мельнік",d:"Обробляє 23 гектари на шести виноградниках, 30-40 тисяч пляшок Піно Нуар і Мюллер-Тургау щороку.",url:null},
-],
-[
-{n:"Znovín Znojmo",loc:"монастир Лоука, Зноймо",d:"Найбільший виробник вина в країні, витримує майже мільйон пляшок у середньовічних льохах колишнього монастиря.",url:"https://www.znovin.cz"},
-{n:"Lahofer Winery",loc:"Добшице",d:"Сучасна виноробня у формі хвилі з розписом на стелі дегустаційного залу і терасою на даху.",url:"https://www.lahofer.cz"},
-{n:"Šobes Vineyard",loc:"закрут річки Дує",d:"Один з найстаріших і найвідоміших виноградників Центральної Європи на крутому річковому закруті, славиться Рислінгом і Палавою.",url:null},
-{n:"Vinné sklepy Šatov",loc:"Шатов, на кордоні з Австрією",d:"Історичний комплекс підземних льохів, що представляє зноймівський Грюнер Вельтлінер і Мюллер-Тургау.",url:null},
-],
-],
-FR:[
-[
-{n:"Château de Pommard",loc:"Поммар",d:"Збудований 1726 року, обробляється біодинамічно — одне з найвідвідуваніших господарств Кот-д'Ор.",url:"https://www.chateaudepommard.com/"},
-{n:"Domaine Faiveley",loc:"Нюї-Сен-Жорж",d:"Родинне господарство з 1825 року і найбільший власник виноградників апеласьйону, відоме Пре'є Крю 'Les Saint-Georges'.",url:"https://domaine-faiveley.com/"},
-{n:"Château de Meursault",loc:"Мерсо",d:"Склепінчасті льохи XII, XIV і XVI століть зберігають 800 000 пляшок під замком.",url:"https://www.chateau-meursault.com/"},
-{n:"Domaine Marquis d'Angerville",loc:"Вольне",d:"Одне з найстаріших господарств Вольне (перша згадка 1507), відоме монопольною ділянкою Clos des Ducs.",url:null},
-],
-[
-{n:"Château Pichon Longueville Baron",loc:"По-йак",d:"Друга категорія (Second Growth), знову відкрита для публіки у 2023 році — екскурсії за записом з вертикальними дегустаціями.",url:"https://www.pichonbaron.com/"},
-{n:"Château Smith Haut Lafitte",loc:"Мартійак",d:"Господарство категорії Cru Classé, відоме винним спа та турами 'мистецтво і природа'.",url:"https://www.smith-haut-lafitte.com/"},
-{n:"Château Palmer",loc:"Марго-Кантенак",d:"Третя категорія за характерним чотиривежевим замком, повністю біодинамічний сертифікат з 2018 року.",url:"https://www.chateau-palmer.com/"},
-{n:"Château Rieussec",loc:"Фарг, Сотерн",d:"Перша категорія Сотерну, що належить Ротшильдам (Лафіт), з екскурсіями льохами за записом.",url:"https://www.lafite.com/domaines/rieussec/"},
-],
-[
-{n:"Domaine Zind-Humbrecht",loc:"Тюркхайм",d:"Вирощує виноград з 1620 року, біодинамічне з 1997, ділянки Гран Крю в Рангені, Голдерті, Генгсті й Бранді.",url:"https://www.zindhumbrecht.fr/"},
-{n:"Domaine Weinbach",loc:"Кайзерсберг",d:"Засноване 1612 року ченцями-капуцинами біля підніжжя Гран Крю Шлоссберг, славиться Рислінгом і Гевюрцтрамінером.",url:"https://www.domaineweinbach.com/"},
-{n:"Maison Trimbach",loc:"Рібовіле",d:"Виробник Clos Sainte-Hune — крихітної монопольної ділянки, одного з найкращих сухих Рислінгів світу.",url:"https://www.trimbach.fr/"},
-{n:"Domaine Marcel Deiss",loc:"Бергайм",d:"Біодинамічне господарство, що відроджує 'комплантацію' — спільну посадку кількох сортів на одній ділянці Гран Крю.",url:"https://www.marceldeiss.com/"},
-],
-],
-IT:[
-[
-{n:"Castello di Ama",loc:"Гайоле-ін-К'янті",d:"Господарство XII століття, реставрація льохів 1998 року започаткувала колекцію сучасного мистецтва серед виноградників.",url:"https://castellodiama.com/en/"},
-{n:"Fontodi",loc:"Панцано-ін-К'янті",d:"Органічне господарство, чиє 100% Санджовезе 'Flaccianello' неодноразово входило до топ вин світу.",url:"https://www.fontodi.com/en/"},
-{n:"Poliziano",loc:"Монтепульчано",d:"Одне з засновників сучасного Vino Nobile, органічно обробляє 170 гектарів місцевого клону Прунйоло Джентіле.",url:"https://carlettipoliziano.com/en/"},
-{n:"Tenuta San Guido (Sassicaia)",loc:"Больгері",d:"Оригінальне господарство Super Tuscan, що започаткувало винну революцію Больгері у 1960-70-х.",url:null},
-],
-[
-{n:"Marchesi di Barolo",loc:"Бароло",d:"Найстаріший і найісторичніший виробник Бароло з підземними льохами і дегустаціями Бароло й Барбареско.",url:"https://marchesibarolo.com/en/"},
-{n:"Ceretto",loc:"Альба/Ланге",d:"Відома 'Cappella del Barolo' — деконсекрованою церквою, перетвореною на мистецький об'єкт на виноградник Брунате.",url:"https://www.ceretto.com"},
-{n:"Vietti",loc:"Кастільоне Фаллето",d:"Створила один з перших односортних крю Бароло у 1950-х і перший односортний П'ємонтський Роеро Арнейс.",url:"https://www.vietti.com/en/"},
-{n:"Produttori del Barbaresco",loc:"Барбареско",d:"Історичний кооператив 1894 року з 53 виноградарів, що працюють виключно з сортом Неббіоло.",url:null},
-],
-[
-{n:"Tenuta delle Terre Nere",loc:"Рандаццо, гора Етна",d:"Заснована піонером сучасного виноробства Етни, перша розлила односортні вина 'contrada' північного схилу.",url:"https://www.tenutaterrenere.com"},
-{n:"Girolamo Russo",loc:"Пассопішаро, гора Етна",d:"Господарство на 15 гектарах на висоті 650-780м, відоме односортними розливами 'Cru'.",url:"https://www.girolamorusso.it/?lang=en"},
-{n:"Donnafugata",loc:"Марсала",d:"Родинне господарство понад століття, льохи 1851 року в традиційному сицилійському 'baglio' з дегустаціями автохтонних сортів.",url:"https://visit.donnafugata.it/en/"},
-{n:"Florio",loc:"Марсала",d:"Заснована 1832 року, історичний дім кріпленого вина Марсала з приватною колекцією понад 40 000 історичних пляшок.",url:null},
-],
-],
-PT:[
-[
-{n:"Quinta do Bomfim",loc:"Піньян",d:"Флагманське господарство портвейну Dow's з прибережним льохом 1896 року і лагарами для імітації топтання ногами.",url:"https://www.symington.com/visitar/quinta-do-bomfim/"},
-{n:"Quinta do Seixo (Sandeman)",loc:"Валенса-ду-Дору",d:"Флагман Sandeman на 100 гектарах, що поєднує садибу XVIII століття з винарнею на схилі й роботизованими лагарами.",url:"https://www.sandeman.com/port-wine/visit/quinta-do-seixo-douro/"},
-{n:"Quinta das Carvalhas",loc:"поблизу Піньяна",d:"Відома як 'обличчя Дору' завдяки драматичним терасам і панорамі 360° з вершини Casa Redonda.",url:null},
-{n:"Quinta do Crasto",loc:"поблизу Сабрози",d:"Сухі кам'яні тераси віком до 400 років тримають лози віком до 90 років на крутих сланцевих схилах.",url:"https://www.quintadocrasto.wine/en/"},
-],
-[
-{n:"Herdade do Esporão",loc:"Регенгош-де-Монсараш",d:"Задокументоване з XIII століття навколо пізньоготичної вежі, перший сертифікований об'єкт винного туризму Португалії.",url:"https://esporao.com/en"},
-{n:"Adega da Cartuxa",loc:"Евора",d:"Керується некомерційним фондом біля Евори зі списку ЮНЕСКО, виробник знаменитого Pêra-Manca.",url:"https://www.vinhosdoalentejo.pt/en/producers/fundacao-eugenio-de-almeida-adega-cartuxa/"},
-{n:"Herdade Grande",loc:"Відігейра",d:"Родинне господарство на 350 гектарах, що поєднує виноградники й оливкові гаї, дегустація 'Vineyards & Vistas'.",url:null},
-{n:"Herdade dos Grous",loc:"поблизу Альберноа",d:"Господарство на 1000 гектарів, назване на честь журавлів на озері, поєднує виноградники, оливки й бутік-готель.",url:null},
-],
-[
-{n:"Quinta de Soalheiro",loc:"Мелгасу",d:"Перший односортний виноградник Альваріньйо в регіоні (1974), піонер якісного Альваріньйо.",url:"https://soalheiro.com/en"},
-{n:"Quinta da Aveleda",loc:"Пенафіел",d:"Родинне господарство з 1870 року, відоме садами на 8 гектарах з вільними павичами і льохом 1850 року.",url:"https://aveleda.com/en/wine-tourism/quinta-da-aveleda"},
-{n:"Quinta de Santa Cristina",loc:"Кабесейраш-де-Башту",d:"Господарство на пагорбі на висоті 400м з 30 гектарами виноградників над долиною річки Тамега.",url:null},
-{n:"Quinta de Lourosa",loc:"район Пасуш-де-Феррейра",d:"Високо оцінена родинна кінта, популярна завдяки екскурсіям і дегустаціям у субрегіоні Соуза.",url:null},
-],
-],
-ES:[
-[
-{n:"Bodegas Ysios",loc:"Лагуардія",d:"Спроєктована Сантьяго Калатравою, хвиляста дахова конструкція з кедра імітує складені бочки на тлі гір Сьєрра-де-Кантабрія.",url:"https://bodegasysios.com/en/"},
-{n:"Bodegas Marqués de Riscal",loc:"Ельсьєго",d:"Дім титанового готелю 'Місто вина' Френка Гері поруч з оригінальною бодегою 1860 року.",url:"https://www.marquesderiscal.com/en/the-marques-de-riscal-city-of-wine"},
-{n:"Bodegas Muga",loc:"Аро",d:"Родинна виноробня з 1932 року, єдина в Ріосі, що досі виготовляє власні дубові бочки.",url:"https://www.bodegasmuga.com/en/"},
-{n:"Bodegas Baigorri",loc:"Саманьєго",d:"Скляний куб над землею приховує сім підземних гравітаційних рівнів на глибині 32 метри.",url:"https://bodegasbaigorri.com/en/"},
-],
-[
-{n:"Bodegas Vega Sicilia",loc:"Вальбуена-де-Дуеро",d:"Найлегендарніша виноробня Іспанії, заснована 1864 року, виробник культового 'Único'.",url:"https://www.temposvegasicilia.com/en/terroirniveau1/4/ribera-del-duero"},
-{n:"Bodegas Protos",loc:"Пеньяфьєль",d:"Сучасне розширення від бюро Річарда Роджерса, теракотові склепіння повторюють силует середньовічного замку над ним.",url:"https://www.bodegasprotos.com/en/architecture/"},
-{n:"Bodegas Emilio Moro",loc:"Пескера-де-Дуеро",d:"Родинна виноробня на лозах, посаджених 1932 року, відома знаменитою лінійкою 'Malleolus'.",url:"https://www.emiliomoro.com/en/"},
-{n:"Bodegas Arzuaga Navarro",loc:"Кінтанілья-де-Онесімо",d:"Побудована навколо маєтку на 1400 гектарів, поєднує тури виноградником з рестораном на зірку Мішлен і спа.",url:"https://arzuaganavarro.com/"},
-],
-[
-{n:"Clos Mogador",loc:"Граталопс",d:"Засноване 1979 року одним із п'яти засновників руху 'Clos', що відродив Пріорат наприкінці 1980-х.",url:null},
-{n:"Celler Vall Llach",loc:"Поррера",d:"Співзасноване каталонським співаком Люїсом Льяком, дегустаційний зал-музей над сланцевими терасами 'льїкорелья'.",url:"https://www.vallllach.com/en/"},
-{n:"Mas Doix",loc:"Побледа",d:"Відома ділянкою лоз Каріньєни, посаджених 1902 року, і Гарначею віком близько 80 років, органічне й біодинамічне господарство.",url:"https://masdoix.com/en/"},
-{n:"Álvaro Palacios",loc:"Граталопс",d:"Засноване 1989 року одним з 'п'яти з Граталопса', виробник L'Ermita з лоз Гарначі, посаджених 1900-1940 років.",url:null},
-],
-],
-UA:[
-[
-{n:"Шато Чижай",loc:"долина Чижай, поблизу Берегового",d:"Перша приватна виноробня України, заснована 1995 року на місці виноробства з XIII століття, з винним музеєм і рестораном.",url:"https://chizay.com/en/"},
-{n:"Родинний льох Парасько",loc:"село Бене",d:"Два брати вирощують до 250 сортів винограду, дегустації у столітньому печерному льоху, викопаному полоненими Першої світової.",url:null},
-{n:"Виноробня Sass K.",loc:"село Кігьош (Зміївка)",d:"Невелика органічна виноробня на вулканічному пагорбі Хазанезе, вирощує близько 60 традиційних карпатських сортів.",url:null},
-{n:"Leanka",loc:"Середнє",d:"Одна з найстаріших виноробень регіону (1946), спеціалізується на автохтонному сорті Леанка, рідному для Карпатського басейну.",url:null},
-],
-[
-{n:"Шабо / Центр винної культури",loc:"село Шабо",d:"Засноване 1822 року швейцарськими і французькими переселенцями, льохи вік 200 років і музей 1500-річної історії виноробства.",url:"https://shabo.ua/en/"},
-{n:"Guliev Wines",loc:"Саратський район",d:"Родина грузинських виноробів у четвертому поколінні, лози посаджені між узбережжям Чорного моря й Дністровським лиманом.",url:null},
-{n:"Artwinery",loc:"перенесено до Одеської області",d:"Один з найбільших виробників ігристого вина в Європі, що переніс команду і 9 мільйонів пляшок на захід після того, як оригінальні льохи опинилися в зоні бойових дій.",url:"https://artwine.com/"},
-{n:"Odessa Sparkling Wine Company",loc:"місто Одеса",d:"Історичний виробник ігристого вина в межах міста, пропонує екскурсії та дегустації традиційним методом.",url:null},
-],
-[
-{n:"Kolonist",loc:"село Криничне, біля озера Ялпуг",d:"Засноване 2005 року нащадками болгарських переселенців, відроджує автохтонний сорт Одеський чорний.",url:"https://kolonist.com.ua/en/"},
-{n:"Болградський завод виноробний",loc:"місто Болград",d:"Велика виноробня в місті, заснованому болгарськими переселенцями 1821 року, формується мікрокліматом Чорного моря.",url:null},
-{n:"Виноробня Стоянова",loc:"місто Кілія",d:"Родинне господарство, засноване 1991 року, на найпівденнішій точці української Бессарабії, де Дунай зустрічається з морем.",url:null},
-{n:"Wintrest / PAVA",loc:"південь Одеської області",d:"Регіональний виробник, що обробляє 650 гектарів, посаджених у 1998-2006 роках.",url:null},
-],
-],
-};
-
-function Popup({item,img,onClose,onWineries,label}) {
+function Popup({item,img,onClose}) {
 if (!item) return null;
 return (
 <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:100,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
@@ -638,63 +344,13 @@ return (
 <div style={{fontSize:21,fontWeight:700,color:TEXT,marginBottom:6}}>{item.n}</div>
 <div style={{width:40,height:1,background:"linear-gradient(90deg,"+ACCENT+",transparent)",marginBottom:14}}/>
 <div style={{fontSize:15,color:MUTED,lineHeight:1.8,fontWeight:500}}>{item.d}</div>
-{onWineries&&(
-<button onClick={onWineries}
-style={{marginTop:18,width:"100%",padding:"11px",background:"rgba(196,154,90,0.12)",border:"1px solid "+B2,borderRadius:10,color:TEXT,fontSize:14,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer",transition:"all 0.2s"}}
-onMouseOver={e=>{e.currentTarget.style.background="rgba(196,154,90,0.22)";}}
-onMouseOut={e=>{e.currentTarget.style.background="rgba(196,154,90,0.12)";}}
->🍇 {label} →</button>
-)}
 </div>
 </div>
 </div>
 );
 }
 
-function WineryCard({w,onAsk,label,visitLabel,img}) {
-const [hov,setHov]=useState(false);
-return (
-<div onMouseOver={()=>setHov(true)} onMouseOut={()=>setHov(false)}
-style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12,marginBottom:16,overflow:"hidden",transition:"all 0.2s"}}>
-{img?
-<div style={{height:180,backgroundImage:"url("+img+")",backgroundSize:"cover",backgroundPosition:"center",transition:"transform 0.3s",transform:hov?"scale(1.04)":"scale(1)"}}/>
-:<div style={{height:3,background:"linear-gradient(90deg,#7a1830,"+ACCENT+",transparent)"}}/>}
-<div style={{padding:"14px 18px 16px"}}>
-<div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{w.n}</div>
-<div style={{fontSize:12,color:ACCENT,letterSpacing:"0.08em",marginBottom:10,textTransform:"uppercase",fontWeight:500}}>{w.loc}</div>
-<div style={{fontSize:14,color:MUTED,lineHeight:1.75,marginBottom:12,fontWeight:500}}>{w.d}</div>
-<div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-{w.url&&(
-<a href={w.url} target="_blank" rel="noopener noreferrer"
-style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",textDecoration:"none",transition:"all 0.2s"}}
-onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
-onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
->{visitLabel} ↗</a>
-)}
-<button onClick={()=>{gaEvent("ask_winery",{winery_name:w.n});onAsk("Tell me more about "+w.n+" in "+w.loc+". What should I know before visiting?");}}
-style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
-onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
-onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
->{label} →</button>
-</div>
-</div>
-</div>
-);
-}
-
-// Maps each route (by index, same order as R[country]/RUA[country]) to its matching
-// region index in REG[country]/REGUA[country] — null when no region covers that route.
-const ROUTE_REGION_MAP={
-HR:[2,1,0,null,null],
-CZ:[0,2,0,1],
-FR:[0,1,2,null,null],
-IT:[0,1,2,null,null],
-PT:[0,1,2,null,null],
-ES:[0,1,null,2,null],
-UA:[0,1,2,0,0,null],
-};
-
-function Card({route,label,onAsk,img,onWineries,wineriesLabel}) {
+function Card({route,label,onAsk,img}) {
 const [hov,setHov]=useState(false);
 return (
 <div onMouseOver={()=>setHov(true)} onMouseOut={()=>setHov(false)}
@@ -706,20 +362,11 @@ style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12
 <div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{route.n}</div>
 <div style={{fontSize:12,color:ACCENT,letterSpacing:"0.08em",marginBottom:10,textTransform:"uppercase",fontWeight:500}}>{route.s}</div>
 <div style={{fontSize:14,color:MUTED,lineHeight:1.75,marginBottom:12,fontWeight:500}}>{route.d}</div>
-<div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
 <button onClick={()=>{gaEvent("ask_route",{route_name:route.n});onAsk("Tell me more about "+route.n+". What should I know before visiting?");}}
 style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
 >{label} →</button>
-{onWineries&&(
-<button onClick={onWineries}
-style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
-onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
-onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
->🍇 {wineriesLabel} →</button>
-)}
-</div>
 </div>
 </div>
 );
@@ -735,7 +382,6 @@ const [country,setCountry]=useState(null);
 const [view,setView]=useState("home");
 const [tab,setTab]=useState("famous");
 const [popup,setPopup]=useState(null);
-const [wineryIdx,setWineryIdx]=useState(null);
 const endRef=useRef(null);
 
 useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,load]);
@@ -744,10 +390,9 @@ useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,load]
 useEffect(()=>{
 let path="/",title="Home";
 if(view==="country"&&country){path="/country/"+country.code;title="Country – "+country.name;}
-else if(view==="wineries"&&country){path="/country/"+country.code+"/wineries/"+wineryIdx;title="Wineries – "+country.name;}
 else if(view==="chat"){path=country?("/country/"+country.code+"/chat"):"/chat";title="Chat";}
 gaEvent("page_view",{page_path:path,page_title:title,page_location:(typeof window!=="undefined"?window.location.origin:"")+path});
-},[view,country,wineryIdx]);
+},[view,country]);
 
 const send=async(text)=>{
 const ut=text||inp.trim();
@@ -775,7 +420,6 @@ const routes=(lang==="ua"?RUA:R)[country?.code]||[];
 const bt=(lang==="ua"?BTUA:BT)[country?.code];
 const regs=(lang==="ua"?REGUA:REG)[country?.code]||[];
 const shown=routes.filter(r=>tab==="famous"?!r.h:r.h);
-const wineryList=wineryIdx!=null?((lang==="ua"?WINERIESUA:WINERIES)[country?.code]?.[wineryIdx]||[]):[];
 
 const TB=(active)=>({
 flex:1,padding:"10px 8px",
@@ -874,38 +518,22 @@ onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.s
 </div>
 )}
 
+{/* Book your stay — Booking.com affiliate (CJ) */}
+<a href={bookingLink(BOOKING_DEST[country.code])} target="_blank" rel="noopener noreferrer sponsored"
+onClick={()=>gaEvent("booking_click",{country_name:country.name})}
+style={{display:"block",textAlign:"center",width:"100%",padding:"14px",marginBottom:20,background:BTN,border:"1px solid "+B2,borderRadius:12,color:TEXT,fontSize:14,fontFamily:"'Raleway',sans-serif",fontWeight:600,textDecoration:"none",letterSpacing:"0.03em",transition:"all 0.2s"}}
+>🏨 {t.book} — {country.name} →</a>
+
 <div style={{display:"flex",gap:8,marginBottom:18}}>
 <button style={TB(tab==="famous")} onClick={()=>setTab("famous")}>🗺️ {t.fam}</button>
 <button style={TB(tab==="hidden")} onClick={()=>setTab("hidden")}>💎 {t.hid}</button>
 </div>
-{shown.map((r,i)=>{
-const rIdx=routes.indexOf(r);
-const regionIdx=ROUTE_REGION_MAP[country.code]?.[rIdx];
-return <Card key={i} route={r} label={t.ask} onAsk={send} img={RIMG[country.code]?.[rIdx]||CIMG[country.code]}
-wineriesLabel={t.wineries}
-onWineries={regionIdx!=null?()=>{gaEvent("view_wineries",{region_name:regs[regionIdx]?.n,country_name:country.name});setWineryIdx(regionIdx);setView("wineries");}:null}/>;
-})}
+{shown.map((r,i)=><Card key={i} route={r} label={t.ask} onAsk={send} img={RIMG[country.code]?.[routes.indexOf(r)]||CIMG[country.code]}/>)}
 <div style={{display:"flex",alignItems:"center",gap:12,margin:"8px 0 14px"}}>
 <div style={{flex:1,height:1,background:B}}/>
 <span style={{color:DIM,fontSize:12,letterSpacing:"0.2em",fontWeight:600}}>{t.or}</span>
 <div style={{flex:1,height:1,background:B}}/>
 </div>
-</div>
-)}
-
-{view==="wineries"&&country&&wineryIdx!=null&&(
-<div>
-<div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-<button onClick={()=>setView("country")} style={{background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:13,padding:0,fontFamily:"'Raleway',sans-serif"}}>← {country.name}</button>
-<div style={{flex:1,textAlign:"center"}}>
-<span style={{fontSize:22,color:TEXT,fontWeight:600}}>{regs[wineryIdx]?.n}</span>
-</div>
-</div>
-{wineryList.map((w,i)=>{
-const pool=RIMG[country.code]||[CIMG[country.code]];
-const img=(w.url&&WINERY_PHOTOS[w.url])||pool[(i+wineryIdx)%pool.length]||CIMG[country.code];
-return <WineryCard key={i} w={w} onAsk={send} label={t.ask} visitLabel={t.visit} img={img}/>;
-})}
 </div>
 )}
 
@@ -959,8 +587,7 @@ style={{width:40,height:40,borderRadius:"50%",background:inp.trim()&&!load?BTN:"
 </div>
 </div>
 
-<Popup item={popup} img={popup&&country?(GIMG[country.code]?.[regs.indexOf(popup)]||CIMG[country.code]):null} onClose={()=>setPopup(null)} label={t.wineries}
-onWineries={popup&&country?()=>{const idx=regs.indexOf(popup);gaEvent("view_wineries",{region_name:popup.n,country_name:country.name});setWineryIdx(idx);setView("wineries");setPopup(null);}:null}/>
+<Popup item={popup} img={popup&&country?(GIMG[country.code]?.[regs.indexOf(popup)]||CIMG[country.code]):null} onClose={()=>setPopup(null)}/>
 <Analytics />
 
 <style>{`
