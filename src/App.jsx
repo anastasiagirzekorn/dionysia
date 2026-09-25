@@ -504,15 +504,8 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.transf
 ))}
 </div>
 
-{/* Booking.com search — CJ affiliate link.
-Note: the official Booking.com iframe SDK (BookingWidget component below) renders a blank
-iframe right now — confirmed on Booking.com's own domain, not a bug in this app. Likely the
-widget/AID isn't fully activated yet after the recent CJ approval. Using a plain tracked link
-here instead until that's resolved; swap back to <BookingWidget/> once it renders content. */}
-<a href={bookingLink("https://www.booking.com/index.html")} target="_blank" rel="noopener noreferrer sponsored"
-onClick={()=>gaEvent("booking_click",{country_name:"home"})}
-style={{display:"block",textAlign:"center",width:"100%",padding:"14px",marginBottom:28,background:BTN,border:"1px solid "+B2,borderRadius:12,color:TEXT,fontSize:14,fontFamily:"'Raleway',sans-serif",fontWeight:600,textDecoration:"none",letterSpacing:"0.03em"}}
->🏨 {t.searchHotels} →</a>
+{/* Booking.com search widget (CJ link 17323521) */}
+<div style={{marginBottom:12,borderRadius:12,overflow:"hidden"}}><BookingWidget/></div>
 
 <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
 <div style={{flex:1,height:1,background:B}}/>
