@@ -378,7 +378,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 function BookingWidget() {
 const ref = useRef(null);
 useEffect(() => {
-const id = "bookingAffiliateWidget_dionysia_home";
+const id = "bookingAffiliateWidget_c0ad5956-48e7-486f-8938-e23ccd849202";
 if (ref.current) ref.current.id = id;
 const init = () => {
 if (window.Booking && window.Booking.AffiliateWidget) {
