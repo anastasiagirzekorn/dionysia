@@ -415,14 +415,35 @@ return (
 );
 }
 
+// SEO: real URLs per screen (/croatia, /croatia/chat, /chat) + per-page title/description
+const SLUG={HR:"croatia",CZ:"czech-republic",FR:"france",IT:"italy",PT:"portugal",ES:"spain",UA:"ukraine"};
+const SEO_DESC={
+HR:{en:"Croatia wine routes: Pelješac Plavac Mali, Istria Malvazija, island wines and hidden Slavonia cellars. Best time to visit and tasting tips.",ua:"Винні маршрути Хорватії: Пелєшац, Істрія, острови та прихована Славонія. Найкращий час для візиту та поради."},
+CZ:{en:"Czech Republic wine routes: Moravia, Mikulov, Znojmo and Bohemia. Wineries, hidden gems and best time to visit.",ua:"Винні маршрути Чехії: Моравія, Мікулов, Зноймо та Богемія. Виноробні, приховані місця та найкращий час для візиту."},
+FR:{en:"France wine routes: Burgundy, Bordeaux, Alsace, Jura and the Northern Rhône. Wineries, tasting tips and best time to visit.",ua:"Винні маршрути Франції: Бургундія, Бордо, Ельзас, Юра та Північна Рона. Виноробні, поради та найкращий час для візиту."},
+IT:{en:"Italy wine routes: Tuscany, Piedmont, Etna in Sicily, Valpolicella and Sardinia. Wineries, hidden gems and best time to visit.",ua:"Винні маршрути Італії: Тоскана, П'ємонт, Етна, Вальполічелла та Сардинія. Виноробні та найкращий час для візиту."},
+PT:{en:"Portugal wine routes: Douro Valley, Alentejo, Vinho Verde, Dão and Madeira. Wineries, tasting tips and best time to visit.",ua:"Винні маршрути Португалії: долина Дору, Алентежу, Віню Верде, Даун і Мадейра. Виноробні та найкращий час для візиту."},
+ES:{en:"Spain wine routes: Rioja, Ribera del Duero, Jerez, Priorat and Rías Baixas. Wineries, tasting tips and best time to visit.",ua:"Винні маршрути Іспанії: Ріоха, Рібера-дель-Дуеро, Херес, Пріорат і Ріас-Байшас. Виноробні та найкращий час для візиту."},
+UA:{en:"Ukraine wine routes: Zakarpattia, Odesa, Bessarabia, Berehove, Iza and Crimean heritage cellars. Wineries and best time to visit.",ua:"Винні маршрути України: Закарпаття, Одеса, Бессарабія, Берегове, Іза та спадщина Криму. Виноробні та найкращий час для візиту."},
+};
+const parsePath=(p)=>{
+const parts=(p||"/").split("/").filter(Boolean);
+const code=Object.keys(SLUG).find(k=>SLUG[k]===parts[0]);
+if(code) return {country:COUNTRIES.find(c=>c.code===code),view:parts[1]==="chat"?"chat":"country"};
+if(parts[0]==="chat") return {country:null,view:"chat"};
+return {country:null,view:"home"};
+};
+const setMeta=(sel,attr,val)=>{const el=document.querySelector(sel);if(el)el.setAttribute(attr,val);};
+
 export default function App() {
 const [lang,setLang]=useState("en");
 const t=T[lang];
 const [msgs,setMsgs]=useState([{role:"assistant",content:T.en.welcome}]);
 const [inp,setInp]=useState("");
 const [load,setLoad]=useState(false);
-const [country,setCountry]=useState(null);
-const [view,setView]=useState("home");
+const initRoute=useState(()=>typeof window!=="undefined"?parsePath(window.location.pathname):{country:null,view:"home"})[0];
+const [country,setCountry]=useState(initRoute.country||null);
+const [view,setView]=useState(initRoute.view);
 const [tab,setTab]=useState("famous");
 const [popup,setPopup]=useState(null);
 const [showPriv,setShowPriv]=useState(false);
@@ -445,13 +466,35 @@ const choose=(v)=>{try{localStorage.setItem("dionysia_consent",v);}catch(e){}app
 // Message text sent when a route card's "Ask" button is pressed
 const askAbout=(name)=>send(lang==="ua"?"Розкажи більше про «"+name+"». Що варто знати перед візитом?":"Tell me more about "+name+". What should I know before visiting?");
 
-// Track virtual pageviews per screen so GA4 shows time-on-page and exit page per section
+// Keep the address bar, title and meta tags in sync with the current screen; track pageviews
 useEffect(()=>{
-let path="/",title="Home";
-if(view==="country"&&country){path="/country/"+country.code;title="Country – "+country.name;}
-else if(view==="chat"){path=country?("/country/"+country.code+"/chat"):"/chat";title="Chat";}
-gaEvent("page_view",{page_path:path,page_title:title,page_location:(typeof window!=="undefined"?window.location.origin:"")+path});
+let path="/",title="Dionysia — Wine Travel",desc="Dionysia — Wine Travel Assistant. Every glass is a new journey.";
+if(country&&view!=="home"){
+path="/"+SLUG[country.code]+(view==="chat"?"/chat":"");
+const cn=lang==="ua"?country.nameUA:country.name;
+title=(lang==="ua"?"Вино в "+cn:"Wine travel in "+cn)+" — Dionysia";
+desc=SEO_DESC[country.code][lang];
+}else if(view==="chat"){path="/chat";title="Chat — Dionysia";}
+if(window.location.pathname!==path) window.history.pushState({},"",path);
+document.title=title;
+setMeta('meta[name="description"]',"content",desc);
+setMeta('meta[property="og:title"]',"content",title);
+setMeta('meta[property="og:description"]',"content",desc);
+setMeta('link[rel="canonical"]',"href","https://www.dionysia.wine"+(path==="/"?"/":path));
+setMeta('meta[property="og:url"]',"content","https://www.dionysia.wine"+(path==="/"?"/":path));
+},[view,country,lang]);
+
+useEffect(()=>{
+const path=window.location.pathname;
+gaEvent("page_view",{page_path:path,page_title:document.title,page_location:window.location.origin+path});
 },[view,country]);
+
+// Browser back/forward buttons
+useEffect(()=>{
+const onPop=()=>{const r=parsePath(window.location.pathname);setCountry(r.country||null);setView(r.view);};
+window.addEventListener("popstate",onPop);
+return()=>window.removeEventListener("popstate",onPop);
+},[]);
 
 const send=async(text)=>{
 const ut=text||inp.trim();
