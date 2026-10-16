@@ -139,6 +139,8 @@ const COUNTRIES=COUNTRIES_RAW;
 // Booking.com affiliate integration (via CJ Affiliate — Dionysia Website ID 101823415)
 const CJ_ID = "101823415-15735418";
 const bookingLink = (dest) => `https://www.tkqlhce.com/click-${CJ_ID}?url=${encodeURIComponent(dest)}`;
+// Set this to the contact email to show the "personal route" button (leave empty to hide it)
+const CONTACT_EMAIL = "";
 const BOOKING_DEST = {
 HR:"https://www.booking.com/searchresults.html?ss=Croatia",
 CZ:"https://www.booking.com/searchresults.html?ss=Czech%20Republic",
@@ -546,7 +548,11 @@ const c=COUNTRIES.find(x=>x.code===where);
 const cn=c?(ua?c.nameUA:c.name):null;
 const w=wine==="any"?null:L.wines[wine];
 const st=L.styles[style];
-const msg=ua
+const msg=ua&&!cn
+?"Я планую винну поїздку на "+days+" "+(days==="1"?"день":(+days<5?"дні":"днів"))+(w?". Улюблене вино: "+w.toLowerCase():"")+". Стиль: "+st.toLowerCase()+". Запропонуй 2–3 різні напрямки з різних країн, коротко поясни, чим кожен підходить, і запитай, для якого скласти повний маршрут по днях."
+:!ua&&!cn
+?"I'm planning a "+days+"-day wine trip"+(w?". I prefer "+w.toLowerCase()+" wine":"")+". Style: "+st.toLowerCase()+". Suggest 2-3 different destinations from different countries, briefly explain why each fits, and ask which one I'd like a full day-by-day plan for."
+:ua
 ?"Склади винний маршрут на "+days+" "+(days==="1"?"день":(+days<5?"дні":"днів"))+(cn?" у країні: "+cn:", порадь найкращий напрямок")+(w?". Улюблене вино: "+w.toLowerCase():"")+". Стиль: "+st.toLowerCase()+". Розбий по днях, додай конкретні виноробні, що поїсти і короткі практичні поради (бронювання, транспорт)."
 :"Plan a "+days+"-day wine trip"+(cn?" in "+cn:" and recommend the best destination")+(w?". I prefer "+w.toLowerCase()+" wine":"")+". Style: "+st.toLowerCase()+". Give a day-by-day plan with specific wineries, what to eat, and short practical tips (booking, transport).";
 gaEvent("plan_route",{days,where,wine,style});
@@ -807,6 +813,7 @@ const pc=COUNTRIES.find(x=>x.code===plan.where);
 const dest=pc?BOOKING_DEST[pc.code]:"https://www.booking.com/index.html";
 return (<div style={{display:"flex",justifyContent:"flex-start",marginTop:10}}>
 <a href={bookingLink(dest)} target="_blank" rel="noopener noreferrer sponsored" onClick={()=>gaEvent("booking_click",{country_name:pc?pc.name:"plan",source:"plan"})} style={{display:"inline-block",padding:"11px 18px",border:"1px solid "+B2,borderRadius:12,color:ACCENT,textDecoration:"none",fontSize:14,fontWeight:600,background:CARD}}>🏨 {pc?(lang==="ua"?"Готелі: "+pc.nameUA:"Hotels in "+pc.name):(lang==="ua"?"Знайти готелі":"Find hotels")} →</a>
+{CONTACT_EMAIL&&pc&&<a href={"mailto:"+CONTACT_EMAIL+"?subject="+encodeURIComponent(lang==="ua"?"Персональний маршрут: "+pc.nameUA:"Personal route: "+pc.name)} onClick={()=>gaEvent("personal_route_click",{country_name:pc.name})} style={{display:"inline-block",marginLeft:10,padding:"11px 18px",border:"1px solid "+B2,borderRadius:12,color:TEXT,textDecoration:"none",fontSize:14,fontWeight:600,background:BTN}}>✉️ {lang==="ua"?"Хочу персональний маршрут":"Get a personal route"}</a>}
 </div>);
 })()}
 </div>
