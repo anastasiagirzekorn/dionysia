@@ -91,7 +91,7 @@ choose:"Choose a destination",or:"OR ASK ANYTHING",chat:"Chat with Dionysia",
 back:"Back",dest:"Destinations",fam:"Famous routes",hid:"Hidden gems",
 bt:"Best time to visit",peak:"Peak",good:"Good",avoid:"Avoid",
 book:"Book your stay",
-searchHotels:"Or search hotels directly",
+hotelsIn:"Hotels in",searchHotels:"Or search hotels directly",
 disclosure:"Some links on this site are affiliate links (e.g. Booking.com). If you book through them, we may earn a commission at no extra cost to you.",
 privacy:"Privacy",privTitle:"Privacy & affiliate disclosure",close:"Close",
 privBody:["Affiliate links: Dionysia contains affiliate links to Booking.com (via CJ Affiliate). If you click one and make a booking, we may earn a commission at no extra cost to you. Booking.com and CJ may set their own cookies when you click.","Chat: your chat messages are sent to Anthropic's Claude API to generate answers. Please do not enter personal or sensitive information. We do not store chat history on our servers.","Analytics: we use Vercel Analytics (anonymous, cookie-free) and, only if you accept, Google Analytics (cookies) to understand how the site is used.","You can change your cookie choice at any time using the \"Cookies\" link in the footer."],
@@ -107,7 +107,7 @@ choose:"Оберіть напрямок",or:"АБО ЗАПИТАЙ БУДЬ-ЩО
 back:"Назад",dest:"Напрямки",fam:"Відомі маршрути",hid:"Приховані перлини",
 bt:"Найкращий час",peak:"Пік",good:"Добре",avoid:"Уникай",
 book:"Забронювати проживання",
-searchHotels:"Або шукайте готелі напряму",
+hotelsIn:"Готелі:",searchHotels:"Або шукайте готелі напряму",
 disclosure:"Частина посилань на сайті — партнерські (наприклад, Booking.com). Якщо ви забронюєте через них, ми можемо отримати комісію, а для вас ціна не зміниться.",
 privacy:"Конфіденційність",privTitle:"Конфіденційність і партнерські посилання",close:"Закрити",
 privBody:["Партнерські посилання: на Dionysia є партнерські посилання на Booking.com (через CJ Affiliate). Якщо ви перейдете за ним і забронюєте, ми можемо отримати комісію, а для вас ціна не зміниться. Booking.com і CJ можуть встановлювати власні cookies після кліку.","Чат: ваші повідомлення надсилаються до Claude API від Anthropic, щоб сформувати відповідь. Будь ласка, не вводьте особисті чи чутливі дані. Історію чату ми не зберігаємо на своїх серверах.","Аналітика: ми використовуємо Vercel Analytics (анонімно, без cookies) і, лише з вашої згоди, Google Analytics (cookies), щоб розуміти, як користуються сайтом.","Вибір щодо cookies можна змінити будь-коли через посилання «Cookies» внизу сторінки."],
@@ -341,7 +341,7 @@ UA:[
 ],
 };
 
-function Popup({item,img,onClose}) {
+function Popup({item,img,onClose,hotelUrl,hotelLabel,onHotel}) {
 if (!item) return null;
 return (
 <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:100,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
@@ -352,6 +352,7 @@ return (
 <div style={{fontSize:21,fontWeight:700,color:TEXT,marginBottom:6}}>{item.n}</div>
 <div style={{width:40,height:1,background:"linear-gradient(90deg,"+ACCENT+",transparent)",marginBottom:14}}/>
 <div style={{fontSize:15,color:MUTED,lineHeight:1.8,fontWeight:500}}>{item.d}</div>
+{hotelUrl&&<a href={hotelUrl} target="_blank" rel="noopener noreferrer sponsored" onClick={onHotel} style={{display:"inline-block",marginTop:18,padding:"10px 18px",border:"1px solid "+B2,borderRadius:10,color:ACCENT,textDecoration:"none",fontSize:14,fontWeight:600,background:CARD}}>🏨 {hotelLabel} →</a>}
 </div>
 </div>
 </div>
@@ -722,7 +723,10 @@ style={{width:40,height:40,borderRadius:"50%",background:inp.trim()&&!load?BTN:"
 </div>
 )}
 
-<Popup item={popup} img={popup&&country?(GIMG[country.code]?.[regs.indexOf(popup)]||CIMG[country.code]):null} onClose={()=>setPopup(null)}/>
+<Popup item={popup} img={popup&&country?(GIMG[country.code]?.[regs.indexOf(popup)]||CIMG[country.code]):null} onClose={()=>setPopup(null)}
+hotelUrl={popup&&country&&REG[country.code]?.[regs.indexOf(popup)]?bookingLink("https://www.booking.com/searchresults.html?ss="+encodeURIComponent(REG[country.code][regs.indexOf(popup)].n+", "+country.name)):null}
+hotelLabel={popup?t.hotelsIn+" "+popup.n:""}
+onHotel={()=>gaEvent("booking_click",{country_name:country?.name,region_name:REG[country?.code]?.[regs.indexOf(popup)]?.n})}/>
 <Analytics />
 
 <style>{`
