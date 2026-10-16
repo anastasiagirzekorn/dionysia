@@ -1,5 +1,5 @@
 const MODEL = 'claude-sonnet-5';
-const MAX_TOKENS = 1200;
+const MAX_TOKENS = 1800;
 const MAX_MESSAGES = 12;
 const MAX_CHARS = 2000;
 
@@ -14,7 +14,7 @@ LANGUAGE RULES (very important):
   : 'The website interface is set to English, so default to English unless the user clearly writes in another language.'}
 
 STYLE:
-- Keep answers concise: under about 250 words unless the user asks for more.
+- Keep answers concise: under about 250 words. Exception: when asked to plan a trip or route, give a day-by-day itinerary (up to about 450 words) with a short heading line per day in **bold**, specific wineries and places, what to eat, and practical tips (booking ahead, transport).
 - You may use short paragraphs, **bold** for key names, and short "- " bullet lists. Do not use tables or headings.
 - Do not address the user by any name, and never invent facts about them.
 - Be honest about uncertainty (opening hours, prices, availability change — suggest checking with the winery).`;
