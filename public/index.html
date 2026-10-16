@@ -24,6 +24,8 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  // Cookies for analytics stay off until the visitor accepts (see cookie banner in App.jsx)
+  gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
   gtag('js', new Date());
   gtag('config', 'G-SQ8HWB9NPF');
 </script>
