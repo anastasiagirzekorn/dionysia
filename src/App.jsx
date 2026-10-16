@@ -18,9 +18,12 @@ PT:"https://images.unsplash.com/photo-1638664370752-8188076afbab?auto=format&fit
 ES:"https://images.unsplash.com/photo-1628691826063-f9b73f6ce0bf?auto=format&fit=crop&w=1200&q=80",
 UA:"https://images.unsplash.com/photo-1667152016525-9f64ddd33f7d?auto=format&fit=crop&w=1200&q=80",
 };
+// Temporary cover photos for the new countries (reused from existing vineyard shots) — replace with real local photos
+CIMG.HU=CIMG.CZ;CIMG.DK=CIMG.FR;CIMG.SE=CIMG.PT;
 
 // One distinct photo per route (same order as R[country] / RUA[country])
 const RIMG={
+
 HR:[
 "https://images.unsplash.com/photo-1722100354846-bcbbf697a273?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1747514550264-6613b5afd177?auto=format&fit=crop&w=1200&q=80",
@@ -125,6 +128,9 @@ const COUNTRIES=[
 {code:"IT",name:"Italy",flag:"🇮🇹",region:"Tuscany · Piedmont · Sicily",nameUA:"Італія",regionUA:"Тоскана · П'ємонт · Сицилія"},
 {code:"PT",name:"Portugal",flag:"🇵🇹",region:"Douro · Alentejo · Vinho Verde",nameUA:"Португалія",regionUA:"Дору · Алентежу · Віню Верде"},
 {code:"ES",name:"Spain",flag:"🇪🇸",region:"Rioja · Ribera · Priorat",nameUA:"Іспанія",regionUA:"Ріоха · Рібера · Пріорат"},
+{code:"HU",name:"Hungary",flag:"🇭🇺",region:"Tokaj · Eger · Villány",nameUA:"Угорщина",regionUA:"Токай · Егер · Віллань"},
+{code:"DK",name:"Denmark",flag:"🇩🇰",region:"Zealand · Jutland · Bornholm",nameUA:"Данія",regionUA:"Зеландія · Ютландія · Борнгольм"},
+{code:"SE",name:"Sweden",flag:"🇸🇪",region:"Skåne · Södermanland",nameUA:"Швеція",regionUA:"Сконе · Седерманланд"},
 {code:"UA",name:"Ukraine",flag:"🇺🇦",region:"Zakarpattia · Odesa · Bessarabia",nameUA:"Україна",regionUA:"Закарпаття · Одеса · Бессарабія"},
 ];
 
@@ -139,6 +145,9 @@ IT:"https://www.booking.com/searchresults.html?ss=Italy",
 PT:"https://www.booking.com/searchresults.html?ss=Portugal",
 ES:"https://www.booking.com/searchresults.html?ss=Spain",
 UA:"https://www.booking.com/searchresults.html?ss=Ukraine",
+HU:"https://www.booking.com/searchresults.html?ss=Hungary",
+DK:"https://www.booking.com/searchresults.html?ss=Denmark",
+SE:"https://www.booking.com/searchresults.html?ss=Sweden",
 };
 
 const R={
@@ -190,6 +199,23 @@ UA:[
 {n:"Berehove — Family Cellars",s:"Parászka Estate · Sass K Winery",d:"Family-run cellars preserving Hungarian traditions. Parászka grows over 250 grape varieties.",h:true},
 {n:"Iza Village — The Wine Village",s:"Iza · Khust · Synevyr",d:"Nearly every household makes homemade wine. Best visited in October during harvest season.",h:true},
 {n:"Crimea — Massandra Imperial Cellars",s:"Massandra · Novy Svet · Koktebel",d:"Ukraine's occupied wine heritage. Massandra cellars hold over 1 million bottles including 19th century wines.",h:true},
+],
+HU:[
+{n:"Tokaj — The Sweet Wine Route",s:"Tokaj · Mád · Royal Tokaji · Hétszőlő",d:"UNESCO-listed historic wine landscape and home of Tokaji Aszú, the sweet wine once called the wine of kings. Furmint and Hárslevelű grow on volcanic soils.",h:false},
+{n:"Eger — Bull's Blood & Beautiful Women's Valley",s:"Eger · Szépasszony-völgy · St. Andrea · Gál Tibor",d:"Baroque town with family cellars carved into tuff rock. Birthplace of Egri Bikavér (Bull's Blood), a red blend, and the open-cellar Valley of the Beautiful Women.",h:false},
+{n:"Villány — Red Wine Capital",s:"Villány · Gere · Bock · Tiffán",d:"Hungary's warmest, southernmost wine region with a Mediterranean feel. Known for Cabernet Franc, Merlot and Portugieser reds.",h:false},
+{n:"Balaton — Volcanic Lake Wines",s:"Badacsony · Szent Orbán · Laposa",d:"Vineyards on extinct volcanoes above Central Europe's largest lake. Mineral whites from Olaszrizling and the rare Kéknyelű.",h:false},
+{n:"Somló — Hungary's Smallest Volcanic Hill",s:"Somló · Juhfark",d:"A single volcanic butte with a cult following. Powerful, mineral Juhfark whites traditionally said to be given to newlyweds.",h:true},
+{n:"Szekszárd — Kadarka & Soft Reds",s:"Szekszárd · Heimann · Vesztergombi",d:"Quiet historic region known for Kadarka and elegant Bikavér blends. Few tourists, many welcoming family cellars.",h:true},
+],
+DK:[
+{n:"Zealand — Vineyards Near Copenhagen",s:"Dalmose · Domaine Aalsgaard",d:"Denmark has a small but real commercial wine scene, built on cool-climate grapes such as Solaris and Rondo. Zealand is the easiest region to reach from Copenhagen.",h:false},
+{n:"Jutland — Cool-Climate Pioneers",s:"Skærsøgaard",d:"Pioneering family vineyards in a cool, windy climate. Expect crisp whites and sparkling wines made from hybrid grapes.",h:false},
+{n:"Bornholm — Baltic Sunshine Island",s:"Lille Gadegård",d:"Denmark's sunniest island, known for smoked fish and craft food, now also home to small vineyards.",h:true},
+],
+SE:[
+{n:"Skåne — Sweden's Wine Heartland",s:"Arild · Kullaberg · Hällåkra",d:"Sweden's mildest, southernmost province and the center of its young wine scene. Vineyards sit among fields, castles and the Kullaberg coast.",h:false},
+{n:"Södermanland — Northern Sparkling",s:"Blaxsta Vingård",d:"Among the northernmost commercial vineyards in the world, known for crisp sparkling wine made from cold-hardy grapes.",h:true},
 ],
 };
 
@@ -243,6 +269,23 @@ UA:[
 {n:"Село Іза — винне село",s:"Іза · Хуст · Синевир",d:"Майже кожна родина виготовляє вино. Найкраще у жовтні під час збору врожаю.",h:true},
 {n:"Крим — імператорські льохи Массандри",s:"Масандра · Новий Світ · Коктебель",d:"Окупована винна спадщина України. Льохи Масандри — понад мільйон пляшок включно з XIX ст.",h:true},
 ],
+HU:[
+{n:"Токай — солодкий винний маршрут",s:"Токай · Мад · Royal Tokaji · Гетсьолльо",d:"Історичний виноробний ландшафт під захистом ЮНЕСКО і батьківщина Токайського Асу — солодкого вина, яке колись називали вином королів. Фурмінт і Гарслевелю ростуть на вулканічних ґрунтах.",h:false},
+{n:"Егер — «Бичача кров» і Долина красунь",s:"Егер · Сепассонь-дьольдь · St. Andrea · Галь Тібор",d:"Барокове містечко з родинними льохами у туфовій скелі. Тут народилась «Бичача кров» (Egri Bikavér) — червоний купаж, і працює Долина красунь із відкритими льохами.",h:false},
+{n:"Віллань — столиця червоного вина",s:"Віллань · Гере · Бок · Тіффан",d:"Найтепліший південний винний регіон Угорщини з середземноморським настроєм. Відомий Каберне Фран, Мерло та Португізером.",h:false},
+{n:"Балатон — вулканічні вина озера",s:"Бадачонь · Сент-Орбан · Лапоша",d:"Виноградники на згаслих вулканах над найбільшим озером Центральної Європи. Мінеральні білі з Олаза-різлінгу та рідкісного Кекнелю.",h:false},
+{n:"Шомльо — найменший вулканічний пагорб",s:"Шомльо · Юхфарк",d:"Один вулканічний пагорб із культовою славою. Потужні мінеральні білі з Юхфарку, які за традицією дарували молодятам.",h:true},
+{n:"Секшард — Кадарка та м'які червоні",s:"Секшард · Хайман · Вестергомбі",d:"Тихий історичний регіон: Кадарка та елегантні купажі Бікавер. Мало туристів і багато привітних родинних льохів.",h:true},
+],
+DK:[
+{n:"Зеландія — виноградники біля Копенгагена",s:"Далмозе · Domaine Aalsgaard",d:"У Данії невелика, але справжня комерційна винна сцена на холодостійких сортах на кшталт Соляріс і Рондо. Зеландія — найзручніший регіон від Копенгагена.",h:false},
+{n:"Ютландія — піонери холодного клімату",s:"Скерсьогор",d:"Піонерські родинні виноградники у прохолодному вітряному кліматі. Свіжі білі та ігристі з гібридних сортів.",h:false},
+{n:"Борнгольм — балтійський острів сонця",s:"Лілле Гадегор",d:"Найсонячніший острів Данії, відомий копченою рибою та крафтовою їжею, а тепер і малими виноградниками.",h:true},
+],
+SE:[
+{n:"Сконе — серце шведського вина",s:"Арільд · Куллаберг · Геллокра",d:"Найм'якша південна провінція Швеції та центр її молодої винної сцени. Виноградники серед полів, замків і узбережжя Куллаберга.",h:false},
+{n:"Седерманланд — північне ігристе",s:"Blaxsta Vingård",d:"Одні з найпівнічніших комерційних виноградників світу, відомі свіжими ігристими з холодостійких сортів.",h:true},
+],
 };
 
 const BT={
@@ -253,6 +296,9 @@ IT:{peak:"Sep – Oct",good:"May – Jun",avoid:"Jul – Aug (heat)",tip:"Sicily
 PT:{peak:"Mid-Sep – Oct",good:"Apr – Jun",avoid:"Jul – Aug (extreme heat)",tip:"Douro harvest — grapes still stomped by foot to music."},
 ES:{peak:"Sep – Oct",good:"Apr – Jun",avoid:"Jul – Aug (30-38C)",tip:"Rioja Harvest Festival in September — traditional grape stomping."},
 UA:{peak:"Sep – Oct",good:"May – Jun",avoid:"Dec – Feb",tip:"Iza village is best in October — every household opens its gates."},
+HU:{peak:"Sep – Oct",good:"May – Jun",avoid:"Dec – Mar",tip:"Harvest festivals run across Tokaj and Eger in September–October; aszú berries are picked as late as November."},
+DK:{peak:"Aug – Sep",good:"Jun – Aug",avoid:"Nov – Mar",tip:"Harvest is usually September–October. Many small vineyards host tastings by appointment only — book ahead."},
+SE:{peak:"Aug – Sep",good:"Jun – Aug",avoid:"Nov – Mar",tip:"Harvest is usually September–October. Many small vineyards host tastings by appointment only — book ahead."},
 };
 
 const BTUA={
@@ -263,6 +309,9 @@ IT:{peak:"Вер – Жов",good:"Тра – Чер",avoid:"Лип – Сер (
 PT:{peak:"Сер вер – Жов",good:"Кві – Чер",avoid:"Лип – Сер (пекло)",tip:"Збір врожаю в Дору — виноград досі тиснуть ногами під музику."},
 ES:{peak:"Вер – Жов",good:"Кві – Чер",avoid:"Лип – Сер (30-38C)",tip:"Фестиваль збору врожаю в Ріосі — традиційне топтання винограду."},
 UA:{peak:"Вер – Жов",good:"Тра – Чер",avoid:"Гру – Лют",tip:"Іза найкраще у жовтні — кожна родина відкриває ворота."},
+HU:{peak:"Вер – Жов",good:"Тра – Чер",avoid:"Гру – Бер",tip:"Фестивалі врожаю в Токаї та Егері — у вересні–жовтні; ягоди для асу збирають до листопада."},
+DK:{peak:"Сер – Вер",good:"Чер – Сер",avoid:"Лис – Бер",tip:"Збір урожаю зазвичай у вересні–жовтні. Багато малих виноградників приймають лише за домовленістю — бронюйте заздалегідь."},
+SE:{peak:"Сер – Вер",good:"Чер – Сер",avoid:"Лис – Бер",tip:"Збір урожаю зазвичай у вересні–жовтні. Багато малих виноградників приймають лише за домовленістю — бронюйте заздалегідь."},
 };
 
 const REG={
@@ -301,6 +350,20 @@ UA:[
 {n:"Odesa",d:"Sunny Black Sea coast — wine produced here since ancient Greek colonists arrived 2,500 years ago."},
 {n:"Bessarabia",d:"Southernmost Ukraine, bordering Romania and Moldova. Chernozem soils and indigenous Odesa Black grapes near Lake Yalpuh."},
 ],
+HU:[
+{n:"Tokaj",d:"UNESCO-listed volcanic region in the northeast. Home of Tokaji Aszú and dry Furmint."},
+{n:"Eger",d:"Baroque town and cellar-carved hills. Birthplace of Egri Bikavér (Bull's Blood)."},
+{n:"Villány",d:"Hungary's warmest region in the south. Cabernet Franc and bold reds."},
+],
+DK:[
+{n:"Zealand",d:"The island around Copenhagen. A handful of cool-climate vineyards within easy reach of the capital."},
+{n:"Jutland",d:"Denmark's mainland peninsula. Pioneer family estates making crisp whites and sparkling wines."},
+{n:"Bornholm",d:"Sunny Baltic island with craft food and small vineyards."},
+],
+SE:[
+{n:"Skåne",d:"Sweden's southernmost, mildest province and the heart of its young wine scene."},
+{n:"Södermanland",d:"Home to some of the world's northernmost commercial vineyards, known for sparkling wine."},
+],
 };
 
 const REGUA={
@@ -338,6 +401,20 @@ UA:[
 {n:"Закарпаття",d:"Найзахідніший регіон України на кордоні з Угорщиною, Словаччиною і Румунією. Вулканічні грунти."},
 {n:"Одеса",d:"Сонячне узбережжя Чорного моря — вино тут виробляють з часів давньогрецьких колоністів."},
 {n:"Бессарабія",d:"Найпівденніший куточок України. Чорноземні грунти і автохтонний Одеський чорний біля озера Ялпуг."},
+],
+HU:[
+{n:"Токай",d:"Вулканічний регіон під захистом ЮНЕСКО на північному сході. Батьківщина Токайського Асу і сухого Фурмінту."},
+{n:"Егер",d:"Барокове місто і пагорби з льохами. Батьківщина «Бичачої крові» (Egri Bikavér)."},
+{n:"Віллань",d:"Найтепліший регіон Угорщини на півдні. Каберне Фран і потужні червоні."},
+],
+DK:[
+{n:"Зеландія",d:"Острів навколо Копенгагена. Кілька холодостійких виноградників поруч зі столицею."},
+{n:"Ютландія",d:"Материковий півострів Данії. Піонерські родинні господарства: свіжі білі та ігристі."},
+{n:"Борнгольм",d:"Сонячний балтійський острів із крафтовою їжею та малими виноградниками."},
+],
+SE:[
+{n:"Сконе",d:"Найпівденніша й найм'якша провінція Швеції, серце її молодої винної сцени."},
+{n:"Седерманланд",d:"Одні з найпівнічніших комерційних виноградників світу, відомі ігристим."},
 ],
 };
 
@@ -417,7 +494,7 @@ return (
 }
 
 // SEO: real URLs per screen (/croatia, /croatia/chat, /chat) + per-page title/description
-const SLUG={HR:"croatia",CZ:"czech-republic",FR:"france",IT:"italy",PT:"portugal",ES:"spain",UA:"ukraine"};
+const SLUG={HR:"croatia",CZ:"czech-republic",FR:"france",IT:"italy",PT:"portugal",ES:"spain",UA:"ukraine",HU:"hungary",DK:"denmark",SE:"sweden"};
 const SEO_DESC={
 HR:{en:"Croatia wine routes: Pelješac Plavac Mali, Istria Malvazija, island wines and hidden Slavonia cellars. Best time to visit and tasting tips.",ua:"Винні маршрути Хорватії: Пелєшац, Істрія, острови та прихована Славонія. Найкращий час для візиту та поради."},
 CZ:{en:"Czech Republic wine routes: Moravia, Mikulov, Znojmo and Bohemia. Wineries, hidden gems and best time to visit.",ua:"Винні маршрути Чехії: Моравія, Мікулов, Зноймо та Богемія. Виноробні, приховані місця та найкращий час для візиту."},
@@ -427,6 +504,9 @@ PT:{en:"Portugal wine routes: Douro Valley, Alentejo, Vinho Verde, Dão and Made
 ES:{en:"Spain wine routes: Rioja, Ribera del Duero, Jerez, Priorat and Rías Baixas. Wineries, tasting tips and best time to visit.",ua:"Винні маршрути Іспанії: Ріоха, Рібера-дель-Дуеро, Херес, Пріорат і Ріас-Байшас. Виноробні та найкращий час для візиту."},
 UA:{en:"Ukraine wine routes: Zakarpattia, Odesa, Bessarabia, Berehove, Iza and Crimean heritage cellars. Wineries and best time to visit.",ua:"Винні маршрути України: Закарпаття, Одеса, Бессарабія, Берегове, Іза та спадщина Криму. Виноробні та найкращий час для візиту."},
 };
+SEO_DESC.HU={en:"Hungary wine routes: Tokaj sweet wines, Eger Bull's Blood, Villány reds and Lake Balaton. Wineries, hidden gems and best time to visit.",ua:"Винні маршрути Угорщини: Токай, Егер, Віллань та Балатон. Виноробні, приховані місця та найкращий час для візиту."};
+SEO_DESC.DK={en:"Denmark wine routes: cool-climate vineyards on Zealand, Jutland and Bornholm. Where to taste Danish wine and when to go.",ua:"Винні маршрути Данії: холодостійкі виноградники Зеландії, Ютландії та Борнгольма. Де куштувати данське вино і коли їхати."};
+SEO_DESC.SE={en:"Sweden wine routes: Skåne and Södermanland, home of some of the world's northernmost vineyards. Where to taste Swedish wine and when to go.",ua:"Винні маршрути Швеції: Сконе та Седерманланд, одні з найпівнічніших виноградників світу. Де куштувати шведське вино і коли їхати."};
 const parsePath=(p)=>{
 const parts=(p||"/").split("/").filter(Boolean);
 const code=Object.keys(SLUG).find(k=>SLUG[k]===parts[0]);
