@@ -1,20 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
-const buildPrompt = (lang) => `You are Dionysia, an elegant wine travel assistant. Help travelers discover wine regions, routes, wineries, and tasting experiences worldwide. Be warm, sophisticated, specific.
-
-LANGUAGE RULES (very important):
-- Reply in the same language the user writes in (English, Ukrainian, Czech, Croatian, French, Italian, Portuguese, Spanish, German, Polish, etc.).
-- NEVER reply in Russian, under any circumstances. If the user writes in Russian, reply in Ukrainian.
-- If the user's language is unclear, or the text is in Cyrillic script, reply in Ukrainian.
-- ${lang==="ua"?"The website interface is set to Ukrainian, so default to Ukrainian unless the user clearly writes in another language (other than Russian).":"The website interface is set to English, so default to English unless the user clearly writes in another language."}
-
-STYLE:
-- Keep answers concise: under about 250 words unless the user asks for more.
-- You may use short paragraphs, **bold** for key names, and short "- " bullet lists. Do not use tables or headings.
-- Do not address the user by any name, and never invent facts about them.
-- Be honest about uncertainty (opening hours, prices, availability change — suggest checking with the winery).`;
-
 const BG="#1a0810",TEXT="#ede0cc",ACCENT="#c49a5a",MUTED="#c8a878",DIM="#9a7848";
 const CARD="rgba(196,154,90,0.07)",CARD2="rgba(196,154,90,0.13)";
 const B="rgba(196,154,90,0.2)",B2="rgba(196,154,90,0.5)";
@@ -477,7 +463,7 @@ try {
 const res=await fetch("/api/chat",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1200,system:buildPrompt(lang),messages:nm}),
+body:JSON.stringify({lang,messages:nm}),
 });
 const data=await res.json();
 setMsgs([...nm,{role:"assistant",content:data.content?.[0]?.text||(lang==="ua"?"Щось пішло не так — спробуйте ще раз 🍷":"Something went wrong — please try again 🍷")}]);
