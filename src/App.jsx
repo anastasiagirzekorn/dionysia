@@ -121,7 +121,7 @@ welcome:"Ласкаво просимо до Діонісії 🍷\n\nЯ твій
 },
 };
 
-const COUNTRIES=[
+const COUNTRIES_RAW=[
 {code:"HR",name:"Croatia",flag:"🇭🇷",region:"Dalmatia · Istria · Pelješac",nameUA:"Хорватія",regionUA:"Далмація · Істрія · Пелєшац"},
 {code:"CZ",name:"Czech Republic",flag:"🇨🇿",region:"Moravia · Bohemia · Znojmo",nameUA:"Чехія",regionUA:"Моравія · Богемія · Зноймо"},
 {code:"FR",name:"France",flag:"🇫🇷",region:"Burgundy · Bordeaux · Alsace",nameUA:"Франція",regionUA:"Бургундія · Бордо · Ельзас"},
@@ -133,6 +133,8 @@ const COUNTRIES=[
 {code:"SE",name:"Sweden",flag:"🇸🇪",region:"Skåne · Södermanland",nameUA:"Швеція",regionUA:"Сконе · Седерманланд"},
 {code:"UA",name:"Ukraine",flag:"🇺🇦",region:"Zakarpattia · Odesa · Bessarabia",nameUA:"Україна",regionUA:"Закарпаття · Одеса · Бессарабія"},
 ];
+const sortedCountries=(lang)=>[...COUNTRIES_RAW].sort((a,b)=>lang==="ua"?a.nameUA.localeCompare(b.nameUA,"uk"):a.name.localeCompare(b.name,"en"));
+const COUNTRIES=COUNTRIES_RAW;
 
 // Booking.com affiliate integration (via CJ Affiliate — Dionysia Website ID 101823415)
 const CJ_ID = "101823415-15735418";
@@ -548,7 +550,7 @@ const msg=ua
 ?"Склади винний маршрут на "+days+" "+(days==="1"?"день":(+days<5?"дні":"днів"))+(cn?" у країні: "+cn:", порадь найкращий напрямок")+(w?". Улюблене вино: "+w.toLowerCase():"")+". Стиль: "+st.toLowerCase()+". Розбий по днях, додай конкретні виноробні, що поїсти і короткі практичні поради (бронювання, транспорт)."
 :"Plan a "+days+"-day wine trip"+(cn?" in "+cn:" and recommend the best destination")+(w?". I prefer "+w.toLowerCase()+" wine":"")+". Style: "+st.toLowerCase()+". Give a day-by-day plan with specific wineries, what to eat, and short practical tips (booking, transport).";
 gaEvent("plan_route",{days,where,wine,style});
-onPlan(msg);
+onPlan(msg,where);
 };
 return (
 <div style={{background:CARD,border:"1px solid "+B,borderRadius:14,padding:"18px 16px",margin:"0 0 26px"}}>
@@ -556,7 +558,7 @@ return (
 <div style={{fontSize:13,color:MUTED,textAlign:"center",lineHeight:1.6,marginBottom:14}}>{L.sub}</div>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10,marginBottom:14}}>
 <div><div style={lab}>{L.days}</div><select style={sel} value={days} onChange={e=>setDays(e.target.value)}>{["1","2","3","4","5","7"].map(d=><option key={d} value={d}>{d}</option>)}</select></div>
-<div><div style={lab}>{L.where}</div><select style={sel} value={where} onChange={e=>setWhere(e.target.value)}><option value="any">{L.any}</option>{COUNTRIES.map(c=><option key={c.code} value={c.code}>{c.flag} {ua?c.nameUA:c.name}</option>)}</select></div>
+<div><div style={lab}>{L.where}</div><select style={sel} value={where} onChange={e=>setWhere(e.target.value)}><option value="any">{L.any}</option>{sortedCountries(lang).map(c=><option key={c.code} value={c.code}>{c.flag} {ua?c.nameUA:c.name}</option>)}</select></div>
 <div><div style={lab}>{L.wine}</div><select style={sel} value={wine} onChange={e=>setWine(e.target.value)}><option value="any">{L.anyW}</option>{Object.entries(L.wines).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
 <div><div style={lab}>{L.style}</div><select style={sel} value={style} onChange={e=>setStyle(e.target.value)}>{Object.entries(L.styles).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
 </div>
@@ -577,6 +579,7 @@ const [view,setView]=useState(initRoute.view);
 const [tab,setTab]=useState("famous");
 const [popup,setPopup]=useState(null);
 const [showPriv,setShowPriv]=useState(false);
+const [plan,setPlan]=useState(null); // {idx, where} — reply index that gets a hotels button
 const [consent,setConsent]=useState("pending");
 const endRef=useRef(null);
 
@@ -687,10 +690,10 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 {view==="home"&&(
 <div>
 <p style={{textAlign:"center",color:MUTED,fontSize:15,fontStyle:"italic",lineHeight:1.85,margin:"8px 0 24px",fontWeight:400}}>{t.sub}</p>
-<Planner lang={lang} onPlan={send}/>
+<Planner lang={lang} onPlan={(m,w)=>{setPlan({idx:msgs.length+1,where:w});send(m);}}/>
 <p style={{color:DIM,fontSize:12,letterSpacing:"0.3em",textTransform:"uppercase",textAlign:"center",marginBottom:14,fontWeight:600}}>{t.choose}</p>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginBottom:28}}>
-{COUNTRIES.map(c=>(
+{sortedCountries(lang).map(c=>(
 <button key={c.code} onClick={()=>{gaEvent("select_country",{country_name:c.name});setCountry(c);setTab("famous");setView("country");}}
 style={{backgroundImage:"linear-gradient(180deg,rgba(26,8,16,0.05) 0%,rgba(26,8,16,0.1) 45%,rgba(26,8,16,0.55) 75%,rgba(26,8,16,0.92) 100%),url("+CIMG[c.code]+")",backgroundSize:"cover",backgroundPosition:"center",border:"1px solid "+B,borderRadius:14,padding:"20px 16px",cursor:"pointer",textAlign:"center",color:TEXT,transition:"all 0.2s",minHeight:230,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.transform="scale(1.02)";}}
@@ -787,7 +790,7 @@ style={{display:"block",textAlign:"center",width:"100%",padding:"14px",marginBot
 <button onClick={()=>setView(country?"country":"home")} style={{background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:13,padding:0,fontFamily:"'Raleway',sans-serif"}}>
 ← {country?(lang==="ua"?country.nameUA:country.name):t.dest}
 </button>
-<button onClick={()=>setMsgs([{role:"assistant",content:t.welcome}])}
+<button onClick={()=>{setPlan(null);setMsgs([{role:"assistant",content:t.welcome}]);}}
 style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"5px 12px",color:DIM,fontSize:12,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=MUTED;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=DIM;}}
@@ -795,8 +798,17 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 </div>
 <div style={{height:8}}/>
 {msgs.map((m,i)=>(
-<div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
+<div key={i}>
+<div style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
 <div style={{maxWidth:"82%",padding:"13px 18px",borderRadius:m.role==="user"?"20px 20px 4px 20px":"20px 20px 20px 4px",background:m.role==="user"?BTN:CARD,border:m.role==="user"?"none":"1px solid "+B,color:m.role==="user"?TEXT:MUTED,fontSize:15,lineHeight:1.78,whiteSpace:m.role==="user"?"pre-wrap":"normal",fontWeight:500}}>{m.role==="user"?m.content:<Md text={m.content}/>}</div>
+</div>
+{plan&&plan.idx===i&&m.role==="assistant"&&!load&&(()=>{
+const pc=COUNTRIES.find(x=>x.code===plan.where);
+const dest=pc?BOOKING_DEST[pc.code]:"https://www.booking.com/index.html";
+return (<div style={{display:"flex",justifyContent:"flex-start",marginTop:10}}>
+<a href={bookingLink(dest)} target="_blank" rel="noopener noreferrer sponsored" onClick={()=>gaEvent("booking_click",{country_name:pc?pc.name:"plan",source:"plan"})} style={{display:"inline-block",padding:"11px 18px",border:"1px solid "+B2,borderRadius:12,color:ACCENT,textDecoration:"none",fontSize:14,fontWeight:600,background:CARD}}>🏨 {pc?(lang==="ua"?"Готелі: "+pc.nameUA:"Hotels in "+pc.name):(lang==="ua"?"Знайти готелі":"Find hotels")} →</a>
+</div>);
+})()}
 </div>
 ))}
 {load&&(
