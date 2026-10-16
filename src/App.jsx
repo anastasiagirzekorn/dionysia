@@ -1,7 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
-const PROMPT = `You are Dionysia, an elegant wine travel assistant. Help travelers discover wine regions, routes, wineries, and tasting experiences worldwide. Speak in the language the user writes in. Be warm, sophisticated, specific.`;
+const buildPrompt = (lang) => `You are Dionysia, an elegant wine travel assistant. Help travelers discover wine regions, routes, wineries, and tasting experiences worldwide. Be warm, sophisticated, specific.
+
+LANGUAGE RULES (very important):
+- Reply in the same language the user writes in (English, Ukrainian, Czech, Croatian, French, Italian, Portuguese, Spanish, German, Polish, etc.).
+- NEVER reply in Russian, under any circumstances. If the user writes in Russian, reply in Ukrainian.
+- If the user's language is unclear, or the text is in Cyrillic script, reply in Ukrainian.
+- ${lang==="ua"?"The website interface is set to Ukrainian, so default to Ukrainian unless the user clearly writes in another language (other than Russian).":"The website interface is set to English, so default to English unless the user clearly writes in another language."}
+
+STYLE:
+- Keep answers concise: under about 250 words unless the user asks for more.
+- You may use short paragraphs, **bold** for key names, and short "- " bullet lists. Do not use tables or headings.
+- Do not address the user by any name, and never invent facts about them.
+- Be honest about uncertainty (opening hours, prices, availability change — suggest checking with the winery).`;
 
 const BG="#1a0810",TEXT="#ede0cc",ACCENT="#c49a5a",MUTED="#c8a878",DIM="#9a7848";
 const CARD="rgba(196,154,90,0.07)",CARD2="rgba(196,154,90,0.13)";
@@ -94,6 +106,10 @@ back:"Back",dest:"Destinations",fam:"Famous routes",hid:"Hidden gems",
 bt:"Best time to visit",peak:"Peak",good:"Good",avoid:"Avoid",
 book:"Book your stay",
 searchHotels:"Or search hotels directly",
+disclosure:"Some links on this site are affiliate links (e.g. Booking.com). If you book through them, we may earn a commission at no extra cost to you.",
+privacy:"Privacy",privTitle:"Privacy & affiliate disclosure",close:"Close",
+privBody:["Affiliate links: Dionysia contains affiliate links to Booking.com (via CJ Affiliate). If you click one and make a booking, we may earn a commission at no extra cost to you. Booking.com and CJ may set their own cookies when you click.","Chat: your chat messages are sent to Anthropic's Claude API to generate answers. Please do not enter personal or sensitive information. We do not store chat history on our servers.","Analytics: we use Vercel Analytics (anonymous, cookie-free) and, only if you accept, Google Analytics (cookies) to understand how the site is used.","You can change your cookie choice at any time using the \"Cookies\" link in the footer."],
+cookieText:"We use cookies for analytics (Google Analytics) to improve the site. Do you accept?",accept:"Accept",decline:"Decline",cookies:"Cookies",
 ask:"Ask Dionysia",newc:"New chat",ph:"Ask about wine regions, routes...",
 pour:"Pouring knowledge...",
 welcome:"Welcome to Dionysia 🍷\n\nI'm your personal wine travel guide — here to help you discover iconic wine routes, hidden vineyards, and unforgettable tasting experiences.\n\nChoose a destination above, or ask me anything.",
@@ -106,6 +122,10 @@ back:"Назад",dest:"Напрямки",fam:"Відомі маршрути",hi
 bt:"Найкращий час",peak:"Пік",good:"Добре",avoid:"Уникай",
 book:"Забронювати проживання",
 searchHotels:"Або шукайте готелі напряму",
+disclosure:"Частина посилань на сайті — партнерські (наприклад, Booking.com). Якщо ви забронюєте через них, ми можемо отримати комісію, а для вас ціна не зміниться.",
+privacy:"Конфіденційність",privTitle:"Конфіденційність і партнерські посилання",close:"Закрити",
+privBody:["Партнерські посилання: на Dionysia є партнерські посилання на Booking.com (через CJ Affiliate). Якщо ви перейдете за ним і забронюєте, ми можемо отримати комісію, а для вас ціна не зміниться. Booking.com і CJ можуть встановлювати власні cookies після кліку.","Чат: ваші повідомлення надсилаються до Claude API від Anthropic, щоб сформувати відповідь. Будь ласка, не вводьте особисті чи чутливі дані. Історію чату ми не зберігаємо на своїх серверах.","Аналітика: ми використовуємо Vercel Analytics (анонімно, без cookies) і, лише з вашої згоди, Google Analytics (cookies), щоб розуміти, як користуються сайтом.","Вибір щодо cookies можна змінити будь-коли через посилання «Cookies» внизу сторінки."],
+cookieText:"Ми використовуємо cookies для аналітики (Google Analytics), щоб покращувати сайт. Погоджуєтесь?",accept:"Прийняти",decline:"Відхилити",cookies:"Cookies",
 ask:"Запитати",newc:"Новий чат",ph:"Запитай про винні маршрути...",
 pour:"Наливаємо знання...",
 welcome:"Ласкаво просимо до Діонісії 🍷\n\nЯ твій особистий гід у світі винного туризму — допоможу відкрити знакові маршрути, приховані виноградники і незабутні дегустації.\n\nОбери напрямок вище або просто запитай.",
@@ -364,7 +384,7 @@ style={{background:hov?CARD2:CARD,border:"1px solid "+(hov?B2:B),borderRadius:12
 <div style={{fontSize:16,fontWeight:600,color:TEXT,marginBottom:4}}>{route.n}</div>
 <div style={{fontSize:12,color:ACCENT,letterSpacing:"0.08em",marginBottom:10,textTransform:"uppercase",fontWeight:500}}>{route.s}</div>
 <div style={{fontSize:14,color:MUTED,lineHeight:1.75,marginBottom:12,fontWeight:500}}>{route.d}</div>
-<button onClick={()=>{gaEvent("ask_route",{route_name:route.n});onAsk("Tell me more about "+route.n+". What should I know before visiting?");}}
+<button onClick={()=>{gaEvent("ask_route",{route_name:route.n});onAsk(route.n);}}
 style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"6px 14px",color:ACCENT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
@@ -374,36 +394,39 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 );
 }
 
-// Official Booking.com Affiliate Widget (interactive search box) — via CJ, Dionysia Website ID 101823415
-function BookingWidget() {
-const ref = useRef(null);
-useEffect(() => {
-const id = "bookingAffiliateWidget_c0ad5956-48e7-486f-8938-e23ccd849202";
-if (ref.current) ref.current.id = id;
-const init = () => {
-if (window.Booking && window.Booking.AffiliateWidget) {
-new window.Booking.AffiliateWidget({
-iframeSettings: { selector: id, responsive: true },
-widgetSettings: { destinationurloverride: "http://www.jdoqocy.com/click-101823415-17323521?sid=" },
+// Minimal safe markdown renderer for chat answers (bold, italic, headings, bullet lists)
+const inlineMd=(s)=>s.split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g).map((p,i)=>{
+if(p.length>4&&p.startsWith("**")&&p.endsWith("**")) return <strong key={i} style={{color:TEXT,fontWeight:700}}>{p.slice(2,-2)}</strong>;
+if(p.length>2&&p.startsWith("*")&&p.endsWith("*")) return <em key={i}>{p.slice(1,-1)}</em>;
+return p;
 });
+
+function Md({text}) {
+const out=[];let list=null;
+const flush=()=>{if(list){out.push(<ul key={"u"+out.length} style={{margin:"4px 0 10px",paddingLeft:20}}>{list.map((x,i)=><li key={i} style={{marginBottom:4}}>{inlineMd(x)}</li>)}</ul>);list=null;}};
+String(text).split("\n").forEach((ln,i)=>{
+const li=ln.match(/^\s*(?:[-*\u2022]|\d+[.)])\s+(.*)/);
+if(li){(list=list||[]).push(li[1]);return;}
+flush();
+const h=ln.match(/^#{1,4}\s+(.*)/);
+if(/^\s*([-*_])\1{2,}\s*$/.test(ln)||ln.trim()==="") return;
+if(h) out.push(<div key={i} style={{fontSize:16,fontWeight:700,color:TEXT,margin:"10px 0 4px"}}>{inlineMd(h[1])}</div>);
+else out.push(<p key={i} style={{margin:"0 0 8px"}}>{inlineMd(ln)}</p>);
+});
+flush();
+return <>{out}</>;
 }
-};
-if (window.Booking && window.Booking.AffiliateWidget) {
-init();
-} else {
-const existing = document.getElementById("booking-affiliate-sdk");
-if (existing) {
-existing.addEventListener("load", init);
-} else {
-const s = document.createElement("script");
-s.id = "booking-affiliate-sdk";
-s.src = "https://www.booking.com/affiliate/prelanding_sdk";
-s.onload = init;
-document.body.appendChild(s);
-}
-}
-}, []);
-return <div ref={ref} style={{ minHeight: 80 }} />;
+
+function PrivacyModal({t,onClose}) {
+return (
+<div onClick={onClose} style={{position:"fixed",inset:0,zIndex:110,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+<div onClick={e=>e.stopPropagation()} style={{background:BG,border:"1px solid rgba(196,154,90,0.35)",borderRadius:16,maxWidth:520,width:"100%",maxHeight:"85vh",overflowY:"auto",padding:"26px 24px"}}>
+<div style={{fontSize:19,fontWeight:700,color:TEXT,marginBottom:12}}>{t.privTitle}</div>
+{t.privBody.map((p,i)=><p key={i} style={{fontSize:14,color:MUTED,lineHeight:1.75,margin:"0 0 12px",fontWeight:500}}>{p}</p>)}
+<button onClick={onClose} style={{marginTop:6,background:BTN,border:"1px solid "+B2,borderRadius:20,padding:"8px 20px",color:TEXT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer"}}>{t.close}</button>
+</div>
+</div>
+);
 }
 
 export default function App() {
@@ -416,9 +439,25 @@ const [country,setCountry]=useState(null);
 const [view,setView]=useState("home");
 const [tab,setTab]=useState("famous");
 const [popup,setPopup]=useState(null);
+const [showPriv,setShowPriv]=useState(false);
+const [consent,setConsent]=useState("pending");
 const endRef=useRef(null);
 
 useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,load]);
+
+// Keep the welcome message in the interface language until the conversation starts
+useEffect(()=>{setMsgs(m=>m.length===1&&m[0].role==="assistant"?[{role:"assistant",content:T[lang].welcome}]:m);},[lang]);
+
+// Cookie consent for Google Analytics (choice is remembered in the browser)
+const applyConsent=(v)=>{try{if(window.gtag)window.gtag("consent","update",{analytics_storage:v==="granted"?"granted":"denied"});}catch(e){}};
+useEffect(()=>{
+let v=null;try{v=localStorage.getItem("dionysia_consent");}catch(e){}
+if(v==="granted"||v==="denied"){applyConsent(v);setConsent(v);}else setConsent("ask");
+},[]);
+const choose=(v)=>{try{localStorage.setItem("dionysia_consent",v);}catch(e){}applyConsent(v);setConsent(v);};
+
+// Message text sent when a route card's "Ask" button is pressed
+const askAbout=(name)=>send(lang==="ua"?"Розкажи більше про «"+name+"». Що варто знати перед візитом?":"Tell me more about "+name+". What should I know before visiting?");
 
 // Track virtual pageviews per screen so GA4 shows time-on-page and exit page per section
 useEffect(()=>{
@@ -438,12 +477,12 @@ try {
 const res=await fetch("/api/chat",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1000,system:PROMPT,messages:nm}),
+body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1200,system:buildPrompt(lang),messages:nm}),
 });
 const data=await res.json();
-setMsgs([...nm,{role:"assistant",content:data.content?.[0]?.text||"Something went wrong."}]);
+setMsgs([...nm,{role:"assistant",content:data.content?.[0]?.text||(lang==="ua"?"Щось пішло не так — спробуйте ще раз 🍷":"Something went wrong — please try again 🍷")}]);
 } catch {
-setMsgs([...nm,{role:"assistant",content:"Something went wrong — please try again 🍷"}]);
+setMsgs([...nm,{role:"assistant",content:lang==="ua"?"Щось пішло не так — спробуйте ще раз 🍷":"Something went wrong — please try again 🍷"}]);
 }
 setLoad(false);
 };
@@ -504,8 +543,15 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.transf
 ))}
 </div>
 
-{/* Booking.com search widget (CJ link 17323521) */}
-<div style={{marginBottom:12,borderRadius:12,overflow:"hidden"}}><BookingWidget/></div>
+{/* Booking.com search — CJ affiliate link.
+Note: the official Booking.com iframe SDK (BookingWidget component below) renders a blank
+iframe right now — confirmed on Booking.com's own domain, not a bug in this app. Likely the
+widget/AID isn't fully activated yet after the recent CJ approval. Using a plain tracked link
+here instead until that's resolved; swap back to <BookingWidget/> once it renders content. */}
+<a href={bookingLink("https://www.booking.com/index.html")} target="_blank" rel="noopener noreferrer sponsored"
+onClick={()=>gaEvent("booking_click",{country_name:"home"})}
+style={{display:"block",textAlign:"center",width:"100%",padding:"14px",marginBottom:28,background:BTN,border:"1px solid "+B2,borderRadius:12,color:TEXT,fontSize:14,fontFamily:"'Raleway',sans-serif",fontWeight:600,textDecoration:"none",letterSpacing:"0.03em"}}
+>🏨 {t.searchHotels} →</a>
 
 <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
 <div style={{flex:1,height:1,background:B}}/>
@@ -566,7 +612,7 @@ style={{display:"block",textAlign:"center",width:"100%",padding:"14px",marginBot
 <button style={TB(tab==="famous")} onClick={()=>setTab("famous")}>🗺️ {t.fam}</button>
 <button style={TB(tab==="hidden")} onClick={()=>setTab("hidden")}>💎 {t.hid}</button>
 </div>
-{shown.map((r,i)=><Card key={i} route={r} label={t.ask} onAsk={send} img={RIMG[country.code]?.[routes.indexOf(r)]||CIMG[country.code]}/>)}
+{shown.map((r,i)=><Card key={i} route={r} label={t.ask} onAsk={askAbout} img={RIMG[country.code]?.[routes.indexOf(r)]||CIMG[country.code]}/>)}
 <div style={{display:"flex",alignItems:"center",gap:12,margin:"8px 0 14px"}}>
 <div style={{flex:1,height:1,background:B}}/>
 <span style={{color:DIM,fontSize:12,letterSpacing:"0.2em",fontWeight:600}}>{t.or}</span>
@@ -590,7 +636,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 <div style={{height:8}}/>
 {msgs.map((m,i)=>(
 <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
-<div style={{maxWidth:"82%",padding:"13px 18px",borderRadius:m.role==="user"?"20px 20px 4px 20px":"20px 20px 20px 4px",background:m.role==="user"?BTN:CARD,border:m.role==="user"?"none":"1px solid "+B,color:m.role==="user"?TEXT:MUTED,fontSize:15,lineHeight:1.78,whiteSpace:"pre-wrap",fontWeight:500}}>{m.content}</div>
+<div style={{maxWidth:"82%",padding:"13px 18px",borderRadius:m.role==="user"?"20px 20px 4px 20px":"20px 20px 20px 4px",background:m.role==="user"?BTN:CARD,border:m.role==="user"?"none":"1px solid "+B,color:m.role==="user"?TEXT:MUTED,fontSize:15,lineHeight:1.78,whiteSpace:m.role==="user"?"pre-wrap":"normal",fontWeight:500}}>{m.role==="user"?m.content:<Md text={m.content}/>}</div>
 </div>
 ))}
 {load&&(
@@ -612,6 +658,16 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 )}
 </div>
 
+{/* Footer: affiliate disclosure + privacy + cookie settings */}
+<div style={{width:"100%",maxWidth:700,padding:"6px 24px 10px",textAlign:"center",zIndex:1}}>
+<p style={{fontSize:11,color:DIM,lineHeight:1.6,margin:"0 0 8px"}}>{t.disclosure}</p>
+<div style={{fontSize:12,color:DIM}}>
+<span onClick={()=>setShowPriv(true)} style={{cursor:"pointer",textDecoration:"underline"}}>{t.privacy}</span>
+<span style={{margin:"0 10px"}}>·</span>
+<span onClick={()=>setConsent("ask")} style={{cursor:"pointer",textDecoration:"underline"}}>{t.cookies}</span>
+</div>
+</div>
+
 {/* Input */}
 <div style={{width:"100%",maxWidth:700,padding:"12px 16px 20px",position:"sticky",bottom:0,background:"linear-gradient(transparent,"+BG+" 30%)",zIndex:2}}>
 <div style={{display:"flex",gap:10,background:CARD,border:"1px solid rgba(196,154,90,0.25)",borderRadius:28,padding:"8px 8px 8px 20px",alignItems:"flex-end"}}>
@@ -624,6 +680,18 @@ style={{width:40,height:40,borderRadius:"50%",background:inp.trim()&&!load?BTN:"
 >↑</button>
 </div>
 </div>
+
+{showPriv&&<PrivacyModal t={t} onClose={()=>setShowPriv(false)}/>}
+
+{consent==="ask"&&(
+<div style={{position:"fixed",left:12,right:12,bottom:90,zIndex:120,maxWidth:560,margin:"0 auto",background:BG,border:"1px solid "+B2,borderRadius:14,padding:"14px 16px",boxShadow:"0 8px 30px rgba(0,0,0,0.5)"}}>
+<div style={{fontSize:13,color:MUTED,lineHeight:1.6,marginBottom:10,fontWeight:500}}>{t.cookieText}</div>
+<div style={{display:"flex",gap:8}}>
+<button onClick={()=>choose("granted")} style={{flex:1,background:BTN,border:"1px solid "+B2,borderRadius:20,padding:"8px 0",color:TEXT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer"}}>{t.accept}</button>
+<button onClick={()=>choose("denied")} style={{flex:1,background:"none",border:"1px solid "+B,borderRadius:20,padding:"8px 0",color:MUTED,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer"}}>{t.decline}</button>
+</div>
+</div>
+)}
 
 <Popup item={popup} img={popup&&country?(GIMG[country.code]?.[regs.indexOf(popup)]||CIMG[country.code]):null} onClose={()=>setPopup(null)}/>
 <Analytics />
