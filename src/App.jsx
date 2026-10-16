@@ -516,6 +516,55 @@ return {country:null,view:"home"};
 };
 const setMeta=(sel,attr,val)=>{const el=document.querySelector(sel);if(el)el.setAttribute(attr,val);};
 
+function Planner({lang,onPlan}) {
+const ua=lang==="ua";
+const [days,setDays]=useState("3");
+const [where,setWhere]=useState("any");
+const [wine,setWine]=useState("any");
+const [style,setStyle]=useState("relaxed");
+const L=ua?{
+title:"Сплануй винний маршрут за 1 хвилину",
+sub:"Обери кілька параметрів — Діонісія складе маршрут по днях із виноробнями, їжею та порадами.",
+days:"Днів",where:"Куди",wine:"Вино",style:"Стиль",btn:"Скласти маршрут →",
+any:"Будь-де / порадь",anyW:"Будь-яке",
+wines:{red:"Червоне",white:"Біле",sparkling:"Ігристе",sweet:"Солодке"},
+styles:{relaxed:"Спокійно",foodie:"Гастро",hidden:"Приховані місця",budget:"Бюджетно"}
+}:{
+title:"Plan your wine trip in a minute",
+sub:"Pick a few options and Dionysia will build a day-by-day route with wineries, food and tips.",
+days:"Days",where:"Where",wine:"Wine",style:"Style",btn:"Build my route →",
+any:"Anywhere / suggest",anyW:"Any",
+wines:{red:"Red",white:"White",sparkling:"Sparkling",sweet:"Sweet"},
+styles:{relaxed:"Relaxed",foodie:"Foodie",hidden:"Hidden gems",budget:"Budget"}
+};
+const sel={width:"100%",background:"rgba(26,8,16,0.6)",color:TEXT,border:"1px solid "+B,borderRadius:8,padding:"9px 8px",fontSize:14,fontFamily:"'Raleway',sans-serif"};
+const lab={fontSize:11,letterSpacing:"0.15em",textTransform:"uppercase",color:DIM,marginBottom:5,fontWeight:600};
+const go=()=>{
+const c=COUNTRIES.find(x=>x.code===where);
+const cn=c?(ua?c.nameUA:c.name):null;
+const w=wine==="any"?null:L.wines[wine];
+const st=L.styles[style];
+const msg=ua
+?"Склади винний маршрут на "+days+" "+(days==="1"?"день":(+days<5?"дні":"днів"))+(cn?" у країні: "+cn:", порадь найкращий напрямок")+(w?". Улюблене вино: "+w.toLowerCase():"")+". Стиль: "+st.toLowerCase()+". Розбий по днях, додай конкретні виноробні, що поїсти і короткі практичні поради (бронювання, транспорт)."
+:"Plan a "+days+"-day wine trip"+(cn?" in "+cn:" and recommend the best destination")+(w?". I prefer "+w.toLowerCase()+" wine":"")+". Style: "+st.toLowerCase()+". Give a day-by-day plan with specific wineries, what to eat, and short practical tips (booking, transport).";
+gaEvent("plan_route",{days,where,wine,style});
+onPlan(msg);
+};
+return (
+<div style={{background:CARD,border:"1px solid "+B,borderRadius:14,padding:"18px 16px",margin:"0 0 26px"}}>
+<div style={{fontSize:18,fontWeight:700,color:TEXT,textAlign:"center",marginBottom:4}}>🍷 {L.title}</div>
+<div style={{fontSize:13,color:MUTED,textAlign:"center",lineHeight:1.6,marginBottom:14}}>{L.sub}</div>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10,marginBottom:14}}>
+<div><div style={lab}>{L.days}</div><select style={sel} value={days} onChange={e=>setDays(e.target.value)}>{["1","2","3","4","5","7"].map(d=><option key={d} value={d}>{d}</option>)}</select></div>
+<div><div style={lab}>{L.where}</div><select style={sel} value={where} onChange={e=>setWhere(e.target.value)}><option value="any">{L.any}</option>{COUNTRIES.map(c=><option key={c.code} value={c.code}>{c.flag} {ua?c.nameUA:c.name}</option>)}</select></div>
+<div><div style={lab}>{L.wine}</div><select style={sel} value={wine} onChange={e=>setWine(e.target.value)}><option value="any">{L.anyW}</option>{Object.entries(L.wines).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
+<div><div style={lab}>{L.style}</div><select style={sel} value={style} onChange={e=>setStyle(e.target.value)}>{Object.entries(L.styles).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
+</div>
+<button onClick={go} style={{width:"100%",background:BTN,color:TEXT,border:"1px solid "+B2,borderRadius:10,padding:"12px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Raleway',sans-serif"}}>{L.btn}</button>
+</div>
+);
+}
+
 export default function App() {
 const [lang,setLang]=useState("en");
 const t=T[lang];
@@ -638,6 +687,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 {view==="home"&&(
 <div>
 <p style={{textAlign:"center",color:MUTED,fontSize:15,fontStyle:"italic",lineHeight:1.85,margin:"8px 0 24px",fontWeight:400}}>{t.sub}</p>
+<Planner lang={lang} onPlan={send}/>
 <p style={{color:DIM,fontSize:12,letterSpacing:"0.3em",textTransform:"uppercase",textAlign:"center",marginBottom:14,fontWeight:600}}>{t.choose}</p>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginBottom:28}}>
 {COUNTRIES.map(c=>(
