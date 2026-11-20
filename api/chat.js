@@ -3,6 +3,50 @@ const MAX_TOKENS = 1800;
 const MAX_MESSAGES = 12;
 const MAX_CHARS = 2000;
 
+// ── Protection against bots flooding the chat ──
+// Limits per visitor (by IP address). Counted in the server's memory, so it is a
+// "best effort" guard: it stops floods and scripts, normal visitors never notice it.
+const LIMIT_PER_MINUTE = 8;
+const LIMIT_PER_HOUR = 60;
+const hits = new Map(); // ip -> array of timestamps (ms)
+
+// Only the Dionysia website may use this chat (plus Vercel previews and local testing).
+const ALLOWED_HOSTS = ['dionysia.wine', 'www.dionysia.wine', 'localhost', '127.0.0.1'];
+const isAllowedOrigin = (req) => {
+  const src = req.headers.origin || req.headers.referer || '';
+  if (!src) return false;
+  try {
+    const host = new URL(src).hostname;
+    return ALLOWED_HOSTS.includes(host) || host.endsWith('.vercel.app');
+  } catch (e) { return false; }
+};
+
+const clientIp = (req) =>
+  String(req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown')
+    .split(',')[0].trim();
+
+// Returns true if this visitor is over the limit; otherwise records the request.
+const tooMany = (ip) => {
+  const now = Date.now();
+  const list = (hits.get(ip) || []).filter(t => now - t < 3600_000);
+  const lastMinute = list.filter(t => now - t < 60_000).length;
+  if (lastMinute >= LIMIT_PER_MINUTE || list.length >= LIMIT_PER_HOUR) {
+    hits.set(ip, list);
+    return true;
+  }
+  list.push(now);
+  hits.set(ip, list);
+  if (hits.size > 5000) { // keep memory small
+    for (const [k, v] of hits) { if (!v.length || now - v[v.length - 1] > 3600_000) hits.delete(k); }
+  }
+  return false;
+};
+
+const BUSY = {
+  en: "You're asking faster than I can pour 🍷 Please wait a minute and try again.",
+  ua: 'Ви питаєте швидше, ніж я встигаю наливати 🍷 Зачекайте хвилинку і спробуйте ще раз.',
+};
+
 const buildPrompt = (lang) => `You are Dionysia, an elegant wine travel assistant. Help travelers discover wine regions, routes, wineries, and tasting experiences worldwide. Be warm, sophisticated, specific. Stay on the topic of wine, food, travel and related culture; politely decline unrelated requests.
 
 LANGUAGE RULES (very important):
@@ -24,9 +68,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!isAllowedOrigin(req)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
   try {
     const body = req.body || {};
     const lang = body.lang === 'ua' ? 'ua' : 'en';
+
+    if (tooMany(clientIp(req))) {
+      res.setHeader('Retry-After', '60');
+      return res.status(429).json({ error: 'Too many requests', content: [{ type: 'text', text: BUSY[lang] }] });
+    }
 
     let messages = Array.isArray(body.messages) ? body.messages : [];
     messages = messages
