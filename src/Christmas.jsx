@@ -619,6 +619,15 @@ export function XmasToggles({lang}){
   const [track,setTrack]=useState(0);
   const box=useRef(null);
   useEffect(()=>()=>{box.current&&box.current.stop();},[]);
+  // Stop the music when the visitor leaves the tab, minimises the browser or locks the phone.
+  // (Phones don't allow restarting sound without a tap, so it stays off until they tap 🎵 again.)
+  useEffect(()=>{
+    const off=()=>{if(box.current){box.current.stop();}setMusic(false);};
+    const onVis=()=>{if(document.hidden)off();};
+    document.addEventListener("visibilitychange",onVis);
+    window.addEventListener("pagehide",off);
+    return()=>{document.removeEventListener("visibilitychange",onVis);window.removeEventListener("pagehide",off);};
+  },[]);
   if(!season) return null;
   const toggleSnow=()=>{const v=!snow;setSnow(v);lsSet("dionysia_snow",v?"on":"off");ga("snow_toggle",{on:v});};
   const toggleMusic=()=>{
