@@ -894,6 +894,12 @@ onHotel={()=>gaEvent("booking_click",{country_name:country?.name,region_name:REG
 .wf{animation:wf 2s ease-in-out infinite}
 textarea::placeholder{color:#5a3838;font-family:'Raleway',sans-serif}
 *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+*{scrollbar-width:thin;scrollbar-color:rgba(196,154,90,0.45) transparent}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(196,154,90,0.4);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(196,154,90,0.7);background-clip:padding-box;border:2px solid transparent}
+::-webkit-scrollbar-corner{background:transparent}
 `}</style>
 </div>
 );

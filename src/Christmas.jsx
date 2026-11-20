@@ -264,13 +264,15 @@ const L={
      soon:(n)=>"Opens on 1 December — in "+n+(n===1?" day":" days")+". Meanwhile, explore the Christmas markets:",
      markets:"Christmas markets in 10 countries",close:"Close",locked:"Opens on",dec:"December",
      show:"Show the answer",ask:"Ask Dionysia →",open:"Explore",note:"Dates checked in November 2026 — confirm on official sites before you travel.",
-     marketsTitle:"Christmas markets",recipes:"Christmas recipes with wine",recipe:"Recipe",serves:"Serves",ing:"Ingredients",steps:"Method",pour:"What to pour",collapse:"Collapse",expand:"Open the advent calendar",pairing:"Pairing",snowOn:"Turn snow off",snowOff:"Turn snow on",musicOn:"Turn music off",musicOff:"Play Christmas music",
+     marketsTitle:"Christmas markets",recipes:"Christmas recipes with wine",recipe:"Recipe",serves:"Serves",ing:"Ingredients",steps:"Method",pour:"What to pour",collapse:"Hide",expand:"Open the advent calendar",pairing:"Pairing",snowOn:"Turn snow off",snowOff:"Turn snow on",musicOn:"Turn music off",musicOff:"Play Christmas music",
+     short:{snow:["Snow: on","Snow: off"],music:["Music: on","Music: off"]},
      types:{wine:"Christmas wine",market:"Christmas market",quiz:"Riddle",ask:"Ask Dionysia",recipe:"Recipe",trip:"Winter trip"}},
  ua:{title:"Адвент-календар Dionysia",sub:"Щодня до Різдва — нове віконце: вина, ярмарки, рецепти й загадки з наших 10 країн.",
      soon:(n)=>"Відкриється 1 грудня — через "+n+" "+(n%10===1&&n%100!==11?"день":(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))?"дні":"днів")+". А поки — різдвяні ярмарки:",
      markets:"Різдвяні ярмарки 10 країн",close:"Закрити",locked:"Відкриється",dec:"грудня",
      show:"Показати відповідь",ask:"Запитати Dionysia →",open:"Перейти",note:"Дати перевірено в листопаді 2026 — уточнюйте на офіційних сайтах перед поїздкою.",
      marketsTitle:"Різдвяні ярмарки",recipes:"Різдвяні рецепти з вином",recipe:"Рецепт",serves:"Порцій",ing:"Інгредієнти",steps:"Приготування",pour:"Що налити",collapse:"Згорнути",expand:"Відкрити адвент-календар",pairing:"Пари",snowOn:"Вимкнути сніг",snowOff:"Увімкнути сніг",musicOn:"Вимкнути музику",musicOff:"Увімкнути різдвяну музику",
+     short:{snow:["Сніг: увімк.","Сніг: вимк."],music:["Музика: увімк.","Музика: вимк."]},
      types:{wine:"Різдвяне вино",market:"Різдвяний ярмарок",quiz:"Загадка",ask:"Запитайте Dionysia",recipe:"Рецепт",trip:"Зимова поїздка"}},
 };
 
@@ -382,12 +384,15 @@ export function Advent({lang,onAsk,onCountry}){
   };
   const w=cur?ADVENT[cur-1]:null;
 
-  if(folded) return(<button onClick={()=>fold(false)} style={{width:"100%",background:CARD,border:"1px solid "+B,borderRadius:14,padding:"14px",margin:"0 0 26px",color:TEXT,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:FONT}}>🎄 {t.expand} ▾</button>);
-  return(<div style={{background:CARD,border:"1px solid "+B,borderRadius:14,padding:"18px 16px",margin:"0 0 26px",position:"relative"}}>
+  const link={background:"rgba(196,154,90,0.14)",border:"1.5px solid "+B2,borderRadius:14,padding:"14px 12px",color:TEXT,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:FONT,display:"flex",alignItems:"center",justifyContent:"center",gap:8};
+  return(<>
+  {folded
+  ?<button onClick={()=>fold(false)} style={{width:"100%",background:CARD,border:"1px solid "+B,borderRadius:14,padding:"14px",margin:"0 0 12px",color:TEXT,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:FONT}}>🎄 {t.expand} ▾</button>
+  :<div style={{background:CARD,border:"1px solid "+B,borderRadius:14,padding:"18px 16px",margin:"0 0 12px",position:"relative"}}>
     <button onClick={()=>{fold(true);ga("advent_fold");}} style={{position:"absolute",top:10,right:10,background:"rgba(196,154,90,0.1)",border:"1px solid "+B2,borderRadius:20,padding:"4px 12px",color:ACCENT,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:FONT}}>{t.collapse} ▴</button>
     <div style={{fontSize:18,fontWeight:700,color:TEXT,textAlign:"center",marginBottom:4,marginTop:22}}>🎄 {t.title}</div>
     <div style={{fontSize:13,color:MUTED,textAlign:"center",lineHeight:1.6,marginBottom:14}}>{upTo===0?t.soon(daysToDec1()):t.sub}</div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(58px,1fr))",gap:8,marginBottom:14}}>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(58px,1fr))",gap:8}}>
       {ADVENT.map((a,i)=>{const n=i+1,can=n<=upTo,isOp=opened.includes(n),isToday=n===today;
         return(<button key={n} onClick={()=>openDoor(n)} disabled={!can} title={can?a.t[lang]:t.locked+" "+n+" "+t.dec}
           style={{aspectRatio:"1",borderRadius:10,border:"1px solid "+(isToday?ACCENT:can?B2:B),background:isOp?"rgba(196,154,90,0.16)":can?BTN:"rgba(196,154,90,0.04)",
@@ -396,10 +401,12 @@ export function Advent({lang,onAsk,onCountry}){
           <span>{n}</span><span style={{fontSize:13}}>{isOp?a.e:can?"✨":"🔒"}</span>
         </button>);})}
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:8}}>
-      <button onClick={()=>{setShowM(true);ga("markets_open");}} style={{background:"none",border:"1px solid "+B2,borderRadius:10,padding:"11px",color:ACCENT,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:FONT}}>🎄 {t.markets} →</button>
-      <button onClick={()=>{setShowR(true);ga("recipes_open");}} style={{background:"none",border:"1px solid "+B2,borderRadius:10,padding:"11px",color:ACCENT,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:FONT}}>🍷 {t.recipes} →</button>
-    </div>
+  </div>}
+
+  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,margin:"0 0 26px"}}>
+    <button onClick={()=>{setShowM(true);ga("markets_open");}} style={link}><span style={{fontSize:20}}>🎄</span>{t.markets}</button>
+    <button onClick={()=>{setShowR(true);ga("recipes_open");}} style={link}><span style={{fontSize:20}}>🍷</span>{t.recipes}</button>
+  </div>
 
     {w&&(<Modal onClose={()=>setCur(null)}>
       <div style={{fontSize:40,textAlign:"center"}}>{w.e}</div>
@@ -417,7 +424,7 @@ export function Advent({lang,onAsk,onCountry}){
     </Modal>)}
     {showM&&<MarketsModal lang={lang} onClose={()=>setShowM(false)} onCountry={onCountry}/>}
     {showR&&<RecipesModal lang={lang} onClose={()=>setShowR(false)}/>}
-  </div>);
+  </>);
 }
 
 /* ───────────── Snow ───────────── */
@@ -447,36 +454,75 @@ function Snow(){
 /* ───────────── Music box (played by the browser, no audio files) ─────────────
    Public-domain melodies: Shchedryk (M. Leontovych, 1916), Silent Night (1818), Jingle Bells (1857). */
 const NOTE=(n)=>{const m=n.match(/^([A-G])(#|b)?(\d)$/);const base={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]==="#"?1:m[2]==="b"?-1:0);return 440*Math.pow(2,(base+(+m[3]+1)*12-69)/12);};
-const SHCHEDRYK=(()=>{const bar=[["Bb5",1],["A5",.5],["Bb5",.5],["G5",1]];let s=[];for(let i=0;i<8;i++)s=s.concat(bar);
-  s=s.concat([["G6",.5],["F6",.5],["Eb6",.5],["D6",.5],["C6",1],["F6",.5],["Eb6",.5],["D6",.5],["C6",.5],["Bb5",1],["Eb6",.5],["D6",.5],["C6",.5],["Bb5",.5],["A5",1],["D6",.5],["C6",.5],["Bb5",.5],["A5",.5],["G5",1]]);
-  for(let i=0;i<4;i++)s=s.concat(bar);return {bpm:150,notes:s.concat([["R",3]])};})();
-const SILENT={bpm:120,notes:[["G5",1.5],["A5",.5],["G5",1],["E5",3],["G5",1.5],["A5",.5],["G5",1],["E5",3],["D6",2],["D6",1],["B5",3],["C6",2],["C6",1],["G5",3],
+// Full melodies at natural tempo (one beat = 1).
+const SHCHEDRYK=(()=>{const A=[["Bb5",1],["A5",.5],["Bb5",.5],["G5",1]];const rep=(n)=>{let r=[];for(let i=0;i<n;i++)r=r.concat(A);return r;};
+  const B=[["G6",.5],["F6",.5],["Eb6",.5],["D6",.5],["C6",1],["F6",.5],["Eb6",.5],["D6",.5],["C6",.5],["Bb5",1],["Eb6",.5],["D6",.5],["C6",.5],["Bb5",.5],["A5",1],["D6",.5],["C6",.5],["Bb5",.5],["A5",.5],["G5",1]];
+  return {bpm:150,verses:2,notes:[].concat(rep(8),B,rep(4),B,rep(8),[["R",3]])};})();
+const SILENT={bpm:120,verses:3,notes:[["G5",1.5],["A5",.5],["G5",1],["E5",3],["G5",1.5],["A5",.5],["G5",1],["E5",3],["D6",2],["D6",1],["B5",3],["C6",2],["C6",1],["G5",3],
   ["A5",2],["A5",1],["C6",1.5],["B5",.5],["A5",1],["G5",1.5],["A5",.5],["G5",1],["E5",3],["A5",2],["A5",1],["C6",1.5],["B5",.5],["A5",1],["G5",1.5],["A5",.5],["G5",1],["E5",3],
   ["D6",2],["D6",1],["F6",1.5],["D6",.5],["B5",1],["C6",3],["E6",3],["C6",1],["G5",1],["E5",1],["G5",1.5],["F5",.5],["D5",1],["C5",6],["R",3]]};
-const JINGLE={bpm:200,notes:[["E5",1],["E5",1],["E5",2],["E5",1],["E5",1],["E5",2],["E5",1],["G5",1],["C5",1.5],["D5",.5],["E5",4],["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],
+const JINGLE={bpm:180,verses:3,notes:[
+  ["G4",1],["E5",1],["D5",1],["C5",1],["G4",3],["G4",.5],["G4",.5],["G4",1],["E5",1],["D5",1],["C5",1],["A4",4],
+  ["A4",1],["F5",1],["E5",1],["D5",1],["B4",4],["G5",1],["G5",1],["F5",1],["D5",1],["E5",4],
+  ["G4",1],["E5",1],["D5",1],["C5",1],["G4",4],["G4",1],["E5",1],["D5",1],["C5",1],["A4",3],["A4",1],
+  ["A4",1],["F5",1],["E5",1],["D5",1],["G5",1],["G5",1],["G5",1],["G5",1],["A5",1],["G5",1],["F5",1],["D5",1],["C5",2],["G5",2],
+  ["E5",1],["E5",1],["E5",2],["E5",1],["E5",1],["E5",2],["E5",1],["G5",1],["C5",1.5],["D5",.5],["E5",4],["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],
   ["E5",1],["D5",1],["D5",1],["E5",1],["D5",2],["G5",2],["E5",1],["E5",1],["E5",2],["E5",1],["E5",1],["E5",2],["E5",1],["G5",1],["C5",1.5],["D5",.5],["E5",4],["F5",1],["F5",1],["F5",1.5],["F5",.5],["F5",1],["E5",1],["E5",1],["E5",.5],["E5",.5],
   ["G5",1],["G5",1],["F5",1],["D5",1],["C5",4],["R",4]]};
-const PLAYLIST=[SHCHEDRYK,SILENT,JINGLE];
+const DECK=(()=>{const P1=[["G5",1.5],["F5",.5],["E5",1],["D5",1],["C5",1],["D5",1],["E5",1],["C5",1],["D5",.5],["E5",.5],["F5",.5],["D5",.5],["E5",1.5],["D5",.5],["C5",1],["B4",1],["C5",2]];
+  const P3=[["D5",1.5],["E5",.5],["F5",1],["D5",1],["E5",1.5],["F5",.5],["G5",1],["D5",1],["E5",.5],["F#5",.5],["G5",1],["A5",.5],["B5",.5],["C6",1],["B5",1],["A5",1],["G5",2]];
+  const P4=[["G5",1.5],["F5",.5],["E5",1],["D5",1],["C5",1],["D5",1],["E5",1],["C5",1],["A5",.5],["A5",.5],["A5",.5],["A5",.5],["G5",1.5],["F5",.5],["E5",1],["D5",1],["C5",2]];
+  return {bpm:112,verses:3,notes:[].concat(P1,P1,P3,P4,[["R",2]])};})();
+const MERRY=(()=>{const A=[["C5",1],["F5",1],["F5",.5],["G5",.5],["F5",.5],["E5",.5],["D5",1],["D5",1],["D5",1],["G5",1],["G5",.5],["A5",.5],["G5",.5],["F5",.5],["E5",1],["C5",1],["C5",1],
+  ["A5",1],["A5",.5],["Bb5",.5],["A5",.5],["G5",.5],["F5",1],["D5",1],["C5",.5],["C5",.5],["D5",1],["G5",1],["E5",1],["F5",2]];
+  const B=[["C5",1],["F5",1],["F5",1],["F5",1],["E5",2],["E5",1],["F5",1],["E5",1],["D5",1],["C5",2],["G5",1],["A5",1],["G5",1],["F5",1],["C6",1],["C5",1],["C5",.5],["C5",.5],["D5",1],["G5",1],["E5",1],["F5",3]];
+  return {bpm:150,verses:4,notes:[].concat(A,B,[["R",2]])};})();
+const TANN=(()=>{const V=[["G4",1],["C5",.75],["C5",.25],["C5",1.5],["D5",.5],["E5",.75],["E5",.25],["E5",1.5],["E5",.5],["D5",.5],["E5",.5],["F5",1],["B4",1],["D5",1],["C5",1],["G5",.5],["G5",.5],
+  ["E5",1],["A5",1.5],["G5",.5],["G5",1],["F5",1],["F5",.5],["F5",.5],["D5",1],["G5",1.5],["F5",.5],["F5",1],["E5",1],
+  ["G4",1],["C5",.75],["C5",.25],["C5",1.5],["D5",.5],["E5",.75],["E5",.25],["E5",1.5],["E5",.5],["D5",.5],["E5",.5],["F5",1],["B4",1],["D5",1],["C5",2]];
+  return {bpm:88,verses:3,notes:[].concat(V,[["R",2]])};})();
+const HARK={bpm:110,verses:3,notes:[["G4",1],["C5",1],["C5",1.5],["B4",.5],["C5",1],["E5",1],["E5",1],["D5",1],["G5",1],["G5",1],["G5",1.5],["F5",.5],["E5",1],["D5",1],["E5",2],
+  ["G4",1],["C5",1],["C5",1.5],["B4",.5],["C5",1],["E5",1],["E5",1],["D5",1],["G5",1],["D5",1],["D5",1.5],["B4",.5],["B4",1],["A4",1],["G4",2],
+  ["G5",1],["G5",1],["G5",1],["C5",1],["F5",1],["E5",1],["E5",1],["D5",1],["G5",1],["G5",1],["G5",1],["C5",1],["F5",1],["E5",1],["E5",1],["D5",1],
+  ["A5",1],["A5",1],["A5",1],["G5",1],["F5",1],["E5",1],["F5",2],["D5",1],["E5",.5],["F5",.5],["G5",1.5],["C5",.5],["C5",1],["D5",1],["E5",2],
+  ["A5",1.5],["A5",.5],["A5",1],["G5",1],["F5",1],["E5",1],["F5",2],["D5",1],["E5",.5],["F5",.5],["G5",1.5],["C5",.5],["C5",1],["D5",1],["C5",4],["R",3]]};
+const PLAYLIST=[SHCHEDRYK,SILENT,JINGLE,DECK,MERRY,TANN,HARK];
+const TRACKS={en:["Shchedryk (Leontovych)","Silent Night","Jingle Bells","Deck the Halls","We Wish You a Merry Christmas","O Tannenbaum","Hark! The Herald Angels Sing"],ua:["Щедрик (Леонтович)","Тиха ніч","Jingle Bells","Deck the Halls","Веселого Різдва","O Tannenbaum (Ялинка)","Ангели співають"]};
+const trackOf=(i)=>i;
 
-function createMusicBox(){
+function createMusicBox(onTrack){
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC) return null;
   const ctx=new AC();const master=ctx.createGain();master.gain.value=0.12;master.connect(ctx.destination);
-  let song=0,idx=0,next=ctx.currentTime+0.1,timer=null;
-  const pluck=(f,t)=>{
-    [[1,0.6,"sine"],[2,0.25,"sine"],[3,0.08,"triangle"]].forEach(([mul,vol,type])=>{
+  let song=0,idx=0,verse=0,next=ctx.currentTime+0.1,timer=null;
+  const announce=()=>{try{onTrack&&onTrack(trackOf(song));}catch(e){}};
+  const tone=(f,t,parts,len)=>{
+    parts.forEach(([mul,vol,type])=>{
       const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f*mul;
-      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.005);g.gain.exponentialRampToValueAtTime(0.0001,t+1.4);
-      o.connect(g);g.connect(master);o.start(t);o.stop(t+1.5);});
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.005);g.gain.exponentialRampToValueAtTime(0.0001,t+len);
+      o.connect(g);g.connect(master);o.start(t);o.stop(t+len+0.1);});
+  };
+  const BOX=[[1,0.6,"sine"],[2,0.25,"sine"],[3,0.08,"triangle"]];
+  const BELL=[[1,0.45,"sine"],[2.76,0.12,"sine"],[5.4,0.05,"sine"]];
+  const BASS=[[1,0.35,"triangle"],[2,0.1,"sine"]];
+  // Each verse sounds a little different: 1) music box, 2) bells an octave up, 3) music box with bass, 4) box + soft bells
+  const pluck=(f,t,beats,v)=>{
+    const k=v%4;
+    if(k===1){tone(f<1000?f*2:f,t,BELL,1.8);return;}
+    tone(f,t,BOX,1.4);
+    if(k===2&&beats>=1)tone(f/4,t,BASS,Math.min(2.5,beats*0.6));
+    if(k===3)tone(f<1000?f*2:f,t,[[1,0.15,"sine"],[2.76,0.04,"sine"]],1.6);
   };
   const schedule=()=>{
     while(next<ctx.currentTime+0.3){
       const s=PLAYLIST[song],[n,beats]=s.notes[idx];const dur=beats*60/s.bpm;
-      if(n!=="R") pluck(NOTE(n),next);
-      next+=dur;idx++;if(idx>=s.notes.length){idx=0;song=(song+1)%PLAYLIST.length;}
+      if(n!=="R") pluck(NOTE(n),next,beats,verse);
+      next+=dur;idx++;
+      if(idx>=s.notes.length){idx=0;verse++;if(verse>=(s.verses||1)){verse=0;song=(song+1)%PLAYLIST.length;announce();}}
     }
   };
   return{
-    play(){ctx.resume();next=Math.max(next,ctx.currentTime+0.05);if(!timer)timer=setInterval(schedule,50);},
+    play(){ctx.resume();announce();next=Math.max(next,ctx.currentTime+0.05);if(!timer)timer=setInterval(schedule,50);},
+    skip(){song=(song+1)%PLAYLIST.length;idx=0;verse=0;next=Math.max(next,ctx.currentTime+0.05);announce();},
     stop(){clearInterval(timer);timer=null;ctx.suspend();},
   };
 }
@@ -490,24 +536,29 @@ export function XmasToggles({lang}){
     try{return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return true;}
   });
   const [music,setMusic]=useState(false); // never starts by itself
+  const [track,setTrack]=useState(0);
   const box=useRef(null);
   useEffect(()=>()=>{box.current&&box.current.stop();},[]);
   if(!season) return null;
   const toggleSnow=()=>{const v=!snow;setSnow(v);lsSet("dionysia_snow",v?"on":"off");ga("snow_toggle",{on:v});};
   const toggleMusic=()=>{
-    if(!box.current) box.current=createMusicBox();
+    if(!box.current) box.current=createMusicBox(setTrack);
     if(!box.current) return;
     if(music){box.current.stop();setMusic(false);}else{box.current.play();setMusic(true);}
     ga("music_toggle",{on:!music});
   };
-  const st=(on)=>({background:on?"rgba(196,154,90,0.15)":"none",border:"1px solid "+(on?B2:B),borderRadius:20,width:34,height:30,fontSize:15,cursor:"pointer",opacity:on?1:0.55,position:"relative",padding:0});
-  const slash=<span style={{position:"absolute",left:6,right:6,top:"50%",height:1.5,background:ACCENT,transform:"rotate(-35deg)"}}/>;
+  const st=(on)=>({background:on?"rgba(196,154,90,0.28)":"rgba(196,154,90,0.12)",border:"1.5px solid "+(on?ACCENT:B2),borderRadius:20,height:34,padding:"0 12px",display:"flex",alignItems:"center",gap:6,color:TEXT,fontSize:13,fontWeight:600,fontFamily:FONT,cursor:"pointer",opacity:1,position:"relative",padding:0,boxShadow:on?"0 0 12px rgba(196,154,90,0.55)":"none",transition:"all 0.2s"});
+  const slash=<span style={{position:"absolute",left:7,right:7,top:"50%",height:2,background:ACCENT,transform:"rotate(-35deg)"}}/>;
   return(<>
-    <style>{".xmas-t{position:absolute;left:24px;top:32px;display:flex;gap:6px;z-index:3}@media(max-width:560px){.xmas-t{position:static;justify-content:center;margin:0 0 12px}}"}</style>
+    <style>{".xmas-t{position:absolute;left:24px;top:32px;display:flex;gap:6px;z-index:3}@media(max-width:1100px){.xmas-t{position:static;justify-content:center;margin:0 0 12px}}"}</style>
     <div className="xmas-t">
-      <button onClick={toggleSnow} title={snow?t.snowOn:t.snowOff} aria-label={snow?t.snowOn:t.snowOff} aria-pressed={snow} style={st(snow)}>❄️{!snow&&slash}</button>
-      <button onClick={toggleMusic} title={music?t.musicOn:t.musicOff} aria-label={music?t.musicOn:t.musicOff} aria-pressed={music} style={st(music)}>🎵{!music&&slash}</button>
+      <button onClick={toggleSnow} title={snow?t.snowOn:t.snowOff} aria-label={snow?t.snowOn:t.snowOff} aria-pressed={snow} style={st(snow)}><span style={{fontSize:17,position:"relative"}}>❄️{!snow&&slash}</span>{t.short.snow[snow?0:1]}</button>
+      <button onClick={toggleMusic} title={music?t.musicOn:t.musicOff} aria-label={music?t.musicOn:t.musicOff} aria-pressed={music} style={st(music)}><span style={{fontSize:17,position:"relative"}}>🎵{!music&&slash}</span>{t.short.music[music?0:1]}</button>
     </div>
+    {music&&<div style={{position:"absolute",left:24,top:72,zIndex:3,display:"flex",alignItems:"center",gap:8,background:CARD,border:"1px solid "+B2,borderRadius:20,padding:"4px 6px 4px 12px",fontFamily:FONT,fontSize:12,color:TEXT,maxWidth:300}}>
+      <span style={{color:ACCENT}}>♪</span><span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{(TRACKS[lang]||TRACKS.en)[trackOf(track)]}</span>
+      <button onClick={()=>box.current&&box.current.skip()} title={lang==="ua"?"Наступна":"Next"} aria-label={lang==="ua"?"Наступна":"Next"} style={{background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:15,padding:"0 4px"}}>⏭</button>
+    </div>}
     {snow&&<Snow/>}
   </>);
 }
