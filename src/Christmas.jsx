@@ -548,6 +548,28 @@ const PLAYLIST=[SHCHEDRYK,SILENT,JINGLE,DECK,MERRY,TANN,HARK];
 const TRACKS={en:["Shchedryk (Leontovych)","Silent Night","Jingle Bells","Deck the Halls","We Wish You a Merry Christmas","O Tannenbaum","Hark! The Herald Angels Sing"],ua:["Щедрик (Леонтович)","Тиха ніч","Jingle Bells","Deck the Halls","Веселого Різдва","O Tannenbaum (Ялинка)","Ангели співають"]};
 const trackOf=(i)=>i;
 
+// iPhone/iPad: the ring/silent switch mutes Web Audio unless the page plays "media".
+// We ask Safari for a media ("playback") audio session, and as a fallback keep a silent
+// looping <audio> element running while the music is on — then music plays like a video would.
+let silentEl=null;
+const silentWav=()=>{
+  const sr=8000,n=sr/2,buf=new ArrayBuffer(44+n),v=new DataView(buf);
+  const w=(o,str)=>{for(let i=0;i<str.length;i++)v.setUint8(o+i,str.charCodeAt(i));};
+  w(0,"RIFF");v.setUint32(4,36+n,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,"data");v.setUint32(40,n,true);
+  for(let i=0;i<n;i++)v.setUint8(44+i,128);
+  let bin="";const b=new Uint8Array(buf);for(let i=0;i<b.length;i++)bin+=String.fromCharCode(b[i]);
+  return "data:audio/wav;base64,"+btoa(bin);
+};
+const mediaSessionOn=()=>{
+  try{if(navigator.audioSession)navigator.audioSession.type="playback";}catch(e){}
+  try{
+    if(!silentEl){silentEl=document.createElement("audio");silentEl.src=silentWav();silentEl.loop=true;silentEl.setAttribute("playsinline","");silentEl.setAttribute("x-webkit-airplay","deny");}
+    const p=silentEl.play();if(p&&p.catch)p.catch(()=>{});
+  }catch(e){}
+};
+const mediaSessionOff=()=>{try{silentEl&&silentEl.pause();}catch(e){}};
+
 function createMusicBox(onTrack){
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC) return null;
   const ctx=new AC();const master=ctx.createGain();master.gain.value=0.12;master.connect(ctx.destination);
@@ -579,9 +601,9 @@ function createMusicBox(onTrack){
     }
   };
   return{
-    play(){ctx.resume();announce();next=Math.max(next,ctx.currentTime+0.05);if(!timer)timer=setInterval(schedule,50);},
+    play(){mediaSessionOn();ctx.resume();announce();next=Math.max(next,ctx.currentTime+0.05);if(!timer)timer=setInterval(schedule,50);},
     skip(){song=(song+1)%PLAYLIST.length;idx=0;verse=0;next=Math.max(next,ctx.currentTime+0.05);announce();},
-    stop(){clearInterval(timer);timer=null;ctx.suspend();},
+    stop(){clearInterval(timer);timer=null;ctx.suspend();mediaSessionOff();},
   };
 }
 
