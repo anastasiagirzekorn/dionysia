@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { XmasToggles, Advent, CountryMarkets, inSeason } from "./Christmas";
 
 const BG="#1a0810",TEXT="#ede0cc",ACCENT="#c49a5a",MUTED="#c8a878",DIM="#9a7848";
 const CARD="rgba(196,154,90,0.07)",CARD2="rgba(196,154,90,0.13)";
@@ -141,6 +142,8 @@ const CJ_ID = "101823415-15735418";
 const bookingLink = (dest) => `https://www.tkqlhce.com/click-${CJ_ID}?url=${encodeURIComponent(dest)}`;
 // Set this to the contact email to show the "personal route" button (leave empty to hide it)
 const CONTACT_EMAIL = "";
+// 🍷 Donations: paste your PayPal.me link between the quotes, e.g. "https://www.paypal.com/paypalme/yourname". Empty = button hidden.
+const DONATE_URL = "";
 const BOOKING_DEST = {
 HR:"https://www.booking.com/searchresults.html?ss=Croatia",
 CZ:"https://www.booking.com/searchresults.html?ss=Czech%20Republic",
@@ -678,6 +681,7 @@ return (
 
 {/* Header */}
 <div style={{width:"100%",maxWidth:700,padding:"28px 24px 16px",textAlign:"center",zIndex:1,position:"relative"}}>
+<XmasToggles lang={lang}/>
 <button onClick={()=>setLang(lang==="en"?"ua":"en")}
 style={{position:"absolute",right:24,top:32,background:"none",border:"1px solid "+B,borderRadius:20,padding:"5px 14px",color:ACCENT,fontSize:12,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
@@ -696,6 +700,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 {view==="home"&&(
 <div>
 <p style={{textAlign:"center",color:MUTED,fontSize:15,fontStyle:"italic",lineHeight:1.85,margin:"8px 0 24px",fontWeight:400}}>{t.sub}</p>
+{inSeason()&&<Advent lang={lang} onAsk={(q)=>send(q)} onCountry={(code)=>{const c=COUNTRIES.find(x=>x.code===code);if(c){setCountry(c);setTab("famous");setView("country");window.scrollTo(0,0);}}}/>}
 <Planner lang={lang} onPlan={(m,w)=>{setPlan({idx:msgs.length+1,where:w});send(m);}}/>
 <p style={{color:DIM,fontSize:12,letterSpacing:"0.3em",textTransform:"uppercase",textAlign:"center",marginBottom:14,fontWeight:600}}>{t.choose}</p>
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginBottom:28}}>
@@ -771,6 +776,8 @@ onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.s
 </div>
 )}
 
+<CountryMarkets lang={lang} code={country.code}/>
+
 {/* Book your stay — Booking.com affiliate (CJ) */}
 <a href={bookingLink(BOOKING_DEST[country.code])} target="_blank" rel="noopener noreferrer sponsored"
 onClick={()=>gaEvent("booking_click",{country_name:country.name})}
@@ -839,6 +846,9 @@ return (<div style={{display:"flex",justifyContent:"flex-start",marginTop:10}}>
 
 {/* Footer: affiliate disclosure + privacy + cookie settings */}
 <div style={{width:"100%",maxWidth:700,padding:"6px 24px 10px",textAlign:"center",zIndex:1}}>
+{DONATE_URL&&<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>gaEvent("donate_click",{})}
+style={{display:"inline-block",margin:"4px 0 12px",padding:"9px 18px",border:"1px solid "+B2,borderRadius:20,color:ACCENT,textDecoration:"none",fontSize:13,fontWeight:600,background:CARD,fontFamily:"'Raleway',sans-serif"}}
+>🍷 {lang==="ua"?"Пригостити Dionysia келихом":"Buy Dionysia a glass of wine"}</a>}
 <p style={{fontSize:11,color:DIM,lineHeight:1.6,margin:"0 0 8px"}}>{t.disclosure}</p>
 <div style={{fontSize:12,color:DIM}}>
 <span onClick={()=>setShowPriv(true)} style={{cursor:"pointer",textDecoration:"underline"}}>{t.privacy}</span>
