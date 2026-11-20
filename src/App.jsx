@@ -143,7 +143,7 @@ const bookingLink = (dest) => `https://www.tkqlhce.com/click-${CJ_ID}?url=${enco
 // Set this to the contact email to show the "personal route" button (leave empty to hide it)
 const CONTACT_EMAIL = "";
 // 🍷 Donations: paste your PayPal.me link between the quotes, e.g. "https://www.paypal.com/paypalme/yourname". Empty = button hidden.
-const DONATE_URL = "";
+const DONATE_URL = "https://paypal.me/AnastasiiaHirzekorn";
 const BOOKING_DEST = {
 HR:"https://www.booking.com/searchresults.html?ss=Croatia",
 CZ:"https://www.booking.com/searchresults.html?ss=Czech%20Republic",
@@ -681,12 +681,20 @@ return (
 
 {/* Header */}
 <div style={{width:"100%",maxWidth:700,padding:"28px 24px 16px",textAlign:"center",zIndex:1,position:"relative"}}>
+<div className="top-bar">
 <XmasToggles lang={lang}/>
+<div className="top-r">
+{DONATE_URL&&<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>gaEvent("donate_click",{place:"header"})}
+title={lang==="ua"?"Пригостити Dionysia келихом":"Buy Dionysia a glass of wine"}
+style={{display:"flex",alignItems:"center",gap:6,height:30,padding:"0 13px",border:"1.5px solid "+B2,borderRadius:20,color:TEXT,textDecoration:"none",fontSize:12,fontWeight:600,background:"rgba(196,154,90,0.14)",fontFamily:"'Raleway',sans-serif",whiteSpace:"nowrap"}}
+>🍷 <span className="don-l">{lang==="ua"?"Пригостити келихом":"Buy me a glass"}</span><span className="don-s">{lang==="ua"?"Келих":"Tip"}</span></a>}
 <button onClick={()=>setLang(lang==="en"?"ua":"en")}
-style={{position:"absolute",right:24,top:32,background:"none",border:"1px solid "+B,borderRadius:20,padding:"5px 14px",color:ACCENT,fontSize:12,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer",transition:"all 0.2s"}}
+style={{background:"none",border:"1px solid "+B,borderRadius:20,padding:"5px 14px",color:ACCENT,fontSize:12,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer",transition:"all 0.2s"}}
 onMouseOver={e=>{e.currentTarget.style.borderColor=B2;e.currentTarget.style.color=TEXT;}}
 onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=ACCENT;}}
 >{lang==="en"?"UA":"EN"}</button>
+</div>
+</div>
 <div onClick={home} style={{cursor:"pointer",display:"inline-block"}}>
 <h1 style={{fontSize:"clamp(26px,5vw,38px)",fontWeight:700,color:TEXT,letterSpacing:"0.16em",margin:0,textTransform:"uppercase"}}>🍷 Dionysia</h1>
 <p style={{color:MUTED,fontSize:12,letterSpacing:"0.28em",textTransform:"uppercase",margin:"5px 0 0",fontWeight:400}}>{t.tag}</p>
@@ -846,9 +854,6 @@ return (<div style={{display:"flex",justifyContent:"flex-start",marginTop:10}}>
 
 {/* Footer: affiliate disclosure + privacy + cookie settings */}
 <div style={{width:"100%",maxWidth:700,padding:"6px 24px 10px",textAlign:"center",zIndex:1}}>
-{DONATE_URL&&<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>gaEvent("donate_click",{})}
-style={{display:"inline-block",margin:"4px 0 12px",padding:"9px 18px",border:"1px solid "+B2,borderRadius:20,color:ACCENT,textDecoration:"none",fontSize:13,fontWeight:600,background:CARD,fontFamily:"'Raleway',sans-serif"}}
->🍷 {lang==="ua"?"Пригостити Dionysia келихом":"Buy Dionysia a glass of wine"}</a>}
 <p style={{fontSize:11,color:DIM,lineHeight:1.6,margin:"0 0 8px"}}>{t.disclosure}</p>
 <div style={{fontSize:12,color:DIM}}>
 <span onClick={()=>setShowPriv(true)} style={{cursor:"pointer",textDecoration:"underline"}}>{t.privacy}</span>
@@ -900,6 +905,11 @@ textarea::placeholder{color:#5a3838;font-family:'Raleway',sans-serif}
 ::-webkit-scrollbar-thumb{background:rgba(196,154,90,0.4);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
 ::-webkit-scrollbar-thumb:hover{background:rgba(196,154,90,0.7);background-clip:padding-box;border:2px solid transparent}
 ::-webkit-scrollbar-corner{background:transparent}
+.top-bar{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin:0 0 14px}
+.top-bar .xmas-t{position:static!important;margin:0!important}
+.top-r{display:flex;gap:8px;align-items:center}
+.don-s{display:none}
+@media(max-width:560px){.don-l{display:none}.don-s{display:inline}}
 `}</style>
 </div>
 );
