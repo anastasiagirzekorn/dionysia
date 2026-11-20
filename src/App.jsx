@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { pageview as vercelView } from "@vercel/analytics";
 import { XmasToggles, Advent, CountryMarkets, inSeason } from "./Christmas";
 
 const BG="#1a0810",TEXT="#ede0cc",ACCENT="#c49a5a",MUTED="#c8a878",DIM="#9a7848";
@@ -9,6 +10,8 @@ const BTN="linear-gradient(135deg,#3a1020,#5a2030)";
 
 // Google Analytics helper — safe no-op if gtag isn't loaded yet
 const gaEvent=(name,params)=>{try{if(typeof window!=="undefined"&&window.gtag){window.gtag("event",name,params||{});}}catch(e){}};
+// Cookie-free click counter for Vercel Analytics (free plan has no custom events, so a click is counted as a "virtual page", e.g. /donate)
+const vClick=(path)=>{try{vercelView({route:path,path});}catch(e){}};
 
 const CIMG={
 HR:"https://images.unsplash.com/photo-1693149864297-e44de7849c51?auto=format&fit=crop&w=1200&q=80",
@@ -501,10 +504,10 @@ return (
 <button onClick={onClose} aria-label="close" style={{position:"absolute",top:12,right:14,background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:22,lineHeight:1}}>×</button>
 <div style={{fontSize:20,fontWeight:700,color:TEXT,marginBottom:12}}>{d.title}</div>
 {d.body.map((p,i)=><p key={i} style={{fontSize:14.5,color:MUTED,lineHeight:1.75,margin:"0 0 12px",fontWeight:500}}>{p}</p>)}
-<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>{gaEvent("donate_click",{place:"modal"});onClose();}}
+<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>{gaEvent("donate_click",{place:"modal",lang});vClick("/donate/paypal");onClose();}}
 style={{display:"block",textAlign:"center",marginTop:6,background:"linear-gradient(135deg,#c49a5a,#a87d40)",borderRadius:22,padding:"12px",color:"#1a0a0e",fontSize:15,fontWeight:700,textDecoration:"none"}}>{d.go}</a>
 <div style={{fontSize:11.5,color:DIM,textAlign:"center",margin:"8px 0 4px",lineHeight:1.5}}>{d.note}</div>
-<button onClick={onClose} style={{display:"block",margin:"6px auto 0",background:"none",border:"none",color:MUTED,fontSize:13,cursor:"pointer",textDecoration:"underline",fontFamily:"'Raleway',sans-serif"}}>{d.later}</button>
+<button onClick={()=>{gaEvent("donate_later",{lang});onClose();}} style={{display:"block",margin:"6px auto 0",background:"none",border:"none",color:MUTED,fontSize:13,cursor:"pointer",textDecoration:"underline",fontFamily:"'Raleway',sans-serif"}}>{d.later}</button>
 </div>
 </div>
 );
@@ -709,7 +712,7 @@ return (
 <div className="top-bar">
 <XmasToggles lang={lang}/>
 <div className="top-r">
-{DONATE_URL&&<a href={DONATE_URL} onClick={e=>{e.preventDefault();gaEvent("donate_open",{});setShowDon(true);}}
+{DONATE_URL&&<a href={DONATE_URL} onClick={e=>{e.preventDefault();gaEvent("donate_open",{lang});vClick("/donate");setShowDon(true);}}
 title={lang==="ua"?"Пригостити Dionysia келихом":"Buy Dionysia a glass of wine"}
 style={{display:"flex",alignItems:"center",gap:6,height:30,padding:"0 13px",border:"1.5px solid "+B2,borderRadius:20,color:TEXT,textDecoration:"none",fontSize:12,fontWeight:600,background:"rgba(196,154,90,0.14)",fontFamily:"'Raleway',sans-serif",whiteSpace:"nowrap"}}
 >🍷 <span className="don-l">{lang==="ua"?"Пригостити келихом":"Buy me a glass"}</span><span className="don-s">{lang==="ua"?"Келих":"Tip"}</span></a>}
