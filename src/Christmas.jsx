@@ -2,6 +2,7 @@
 // Everything here switches itself on from 20 Nov and off after 7 Jan.
 // Test any time with ?xmas=1 (show the season) or ?advent=all (all doors open).
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 const BG="#1a0810",TEXT="#ede0cc",ACCENT="#c49a5a",MUTED="#c8a878",DIM="#9a7848";
 const CARD="rgba(196,154,90,0.07)",B="rgba(196,154,90,0.2)",B2="rgba(196,154,90,0.5)";
@@ -264,14 +265,14 @@ const L={
      soon:(n)=>"Opens on 1 December — in "+n+(n===1?" day":" days")+". Meanwhile, explore the Christmas markets:",
      markets:"Christmas markets in 10 countries",close:"Close",locked:"Opens on",dec:"December",
      show:"Show the answer",ask:"Ask Dionysia →",open:"Explore",note:"Dates checked in November 2026 — confirm on official sites before you travel.",
-     marketsTitle:"Christmas markets",recipes:"Christmas recipes with wine",recipe:"Recipe",serves:"Serves",ing:"Ingredients",steps:"Method",pour:"What to pour",collapse:"Hide",expand:"Open the advent calendar",pairing:"Pairing",snowOn:"Turn snow off",snowOff:"Turn snow on",musicOn:"Turn music off",musicOff:"Play Christmas music",
+     marketsTitle:"Christmas markets",recipes:"Christmas recipes with wine",recipe:"Recipe",serves:"Serves",ing:"Ingredients",steps:"Method",pour:"What to pour",collapse:"Hide",gifts:"Gift ideas for wine lovers",giftsSub:"Christmas gift ideas — from a bottle with a story to a night at a winery.",giftAsk:"Ask Dionysia to help choose a gift",buy:"Buy",expand:"Open the advent calendar",pairing:"Pairing",snowOn:"Turn snow off",snowOff:"Turn snow on",musicOn:"Turn music off",musicOff:"Play Christmas music",
      short:{snow:["Snow: on","Snow: off"],music:["Music: on","Music: off"]},
      types:{wine:"Christmas wine",market:"Christmas market",quiz:"Riddle",ask:"Ask Dionysia",recipe:"Recipe",trip:"Winter trip"}},
  ua:{title:"Адвент-календар Dionysia",sub:"Щодня до Різдва — нове віконце: вина, ярмарки, рецепти й загадки з наших 10 країн.",
      soon:(n)=>"Відкриється 1 грудня — через "+n+" "+(n%10===1&&n%100!==11?"день":(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))?"дні":"днів")+". А поки — різдвяні ярмарки:",
      markets:"Різдвяні ярмарки 10 країн",close:"Закрити",locked:"Відкриється",dec:"грудня",
      show:"Показати відповідь",ask:"Запитати Dionysia →",open:"Перейти",note:"Дати перевірено в листопаді 2026 — уточнюйте на офіційних сайтах перед поїздкою.",
-     marketsTitle:"Різдвяні ярмарки",recipes:"Різдвяні рецепти з вином",recipe:"Рецепт",serves:"Порцій",ing:"Інгредієнти",steps:"Приготування",pour:"Що налити",collapse:"Згорнути",expand:"Відкрити адвент-календар",pairing:"Пари",snowOn:"Вимкнути сніг",snowOff:"Увімкнути сніг",musicOn:"Вимкнути музику",musicOff:"Увімкнути різдвяну музику",
+     marketsTitle:"Різдвяні ярмарки",recipes:"Різдвяні рецепти з вином",recipe:"Рецепт",serves:"Порцій",ing:"Інгредієнти",steps:"Приготування",pour:"Що налити",collapse:"Згорнути",gifts:"Подарунки для поціновувачів вина",giftsSub:"Ідеї різдвяних подарунків — від пляшки з історією до ночі на виноробні.",giftAsk:"Попросити Dionysia допомогти з подарунком",buy:"Купити",expand:"Відкрити адвент-календар",pairing:"Пари",snowOn:"Вимкнути сніг",snowOff:"Увімкнути сніг",musicOn:"Вимкнути музику",musicOff:"Увімкнути різдвяну музику",
      short:{snow:["Сніг: увімк.","Сніг: вимк."],music:["Музика: увімк.","Музика: вимк."]},
      types:{wine:"Різдвяне вино",market:"Різдвяний ярмарок",quiz:"Загадка",ask:"Запитайте Dionysia",recipe:"Рецепт",trip:"Зимова поїздка"}},
 };
@@ -279,13 +280,13 @@ const L={
 /* ───────────── Modal shell ───────────── */
 function Modal({onClose,children,wide}){
   useEffect(()=>{const k=e=>{if(e.key==="Escape")onClose();};window.addEventListener("keydown",k);return()=>window.removeEventListener("keydown",k);},[onClose]);
-  return(
+  return createPortal(
   <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:130,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
     <div onClick={e=>e.stopPropagation()} style={{background:BG,border:"1px solid rgba(196,154,90,0.35)",borderRadius:16,maxWidth:wide?600:460,width:"100%",maxHeight:"86vh",overflowY:"auto",position:"relative",padding:"26px 24px",fontFamily:FONT}}>
       <button onClick={onClose} aria-label="close" style={{position:"absolute",top:12,right:14,background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:22,lineHeight:1}}>×</button>
       {children}
     </div>
-  </div>);
+  </div>,document.body);
 }
 
 function MarketList({lang,code}){
@@ -363,6 +364,60 @@ export function RecipesModal({lang,onClose,start}){
   </Modal>);
 }
 
+/* ───────────── Gift ideas for wine lovers ─────────────
+   url: leave "" for now — later put an affiliate link here and a "Buy" button appears. */
+const GIFTS=[
+ {e:"🍾",t:{en:"A bottle with a story",ua:"Пляшка з історією"},items:[
+  {c:"HR",n:{en:"Dingač or Postup (Plavac Mali)",ua:"Dingač або Postup (Plavac Mali)"},d:{en:"Powerful reds from the steep slopes of Pelješac above the sea.",ua:"Потужні червоні зі стрімких схилів Пелєшаца над морем."},url:""},
+  {c:"CZ",n:{en:"Moravian ice wine or straw wine",ua:"Моравське льодове або солом'яне вино"},d:{en:"Sweet rarities: grapes picked frozen or dried on straw.",ua:"Солодкі рідкості: виноград збирають замерзлим або сушать на соломі."},url:""},
+  {c:"HU",n:{en:"Tokaji Aszú",ua:"Токай Асу"},d:{en:"Hungary's legendary sweet wine — a classic gift for any wine lover.",ua:"Легендарне солодке вино Угорщини — класичний подарунок для поціновувача."},url:""},
+  {c:"FR",n:{en:"Champagne or Sauternes",ua:"Шампанське або Сотерн"},d:{en:"Bubbles for the New Year, or golden sweet wine for dessert.",ua:"Бульбашки на Новий рік або золотаве солодке вино до десерту."},url:""},
+  {c:"IT",n:{en:"Barolo or Amarone",ua:"Бароло або Амароне"},d:{en:"Big Italian reds to open now or keep for years.",ua:"Великі італійські червоні: відкрити зараз або зберігати роками."},url:""},
+  {c:"PT",n:{en:"10- or 20-year-old Tawny Port",ua:"Портвейн Tawny 10 або 20 років"},d:{en:"Nutty, caramel notes — perfect with Christmas sweets.",ua:"Горіхові й карамельні ноти — ідеально до різдвяних солодощів."},url:""},
+  {c:"ES",n:{en:"Rioja Gran Reserva or Pedro Ximénez sherry",ua:"Ріоха Gran Reserva або херес Педро Хіменес"},d:{en:"Long-aged Rioja, or a dark, raisiny sherry for dessert.",ua:"Довго витримана Ріоха або темний ізюмний херес до десерту."},url:""},
+  {c:"UA",n:{en:"A bottle from Shabo, Beykush or Kolonist",ua:"Пляшка від Shabo, Beykush чи Kolonist"},d:{en:"Ukrainian wine — and support for winemakers who keep working.",ua:"Українське вино — і підтримка виноробів, які продовжують працювати."},url:""},
+ ]},
+ {e:"🥂",t:{en:"Accessories",ua:"Аксесуари"},items:[
+  {n:{en:"Fine thin-rim glasses",ua:"Якісні келихи з тонкого скла"},d:{en:"Good glasses change the taste more than people expect.",ua:"Добрі келихи змінюють смак більше, ніж здається."},url:""},
+  {n:{en:"A decanter",ua:"Декантер"},d:{en:"Lets young reds breathe and looks beautiful on the table.",ua:"Дає молодим червоним «подихати» і гарно виглядає на столі."},url:""},
+  {n:{en:"Coravin",ua:"Coravin"},d:{en:"Pour a glass without pulling the cork — the rest of the bottle keeps for weeks.",ua:"Наливає келих, не виймаючи корок, — решта пляшки зберігається тижнями."},url:""},
+  {n:{en:"Vacuum stopper and wine thermometer",ua:"Вакуумна пробка і термометр для вина"},d:{en:"Small, inexpensive, and genuinely useful.",ua:"Невеликі, недорогі й справді корисні."},url:""},
+ ]},
+ {e:"🗺️",t:{en:"Experiences",ua:"Враження"},items:[
+  {n:{en:"A tasting at a local winery",ua:"Дегустація на місцевій виноробні"},d:{en:"Many wineries sell gift vouchers — ask Dionysia for ideas in your region.",ua:"Багато виноробень продають подарункові сертифікати — запитайте Dionysia про ідеї у вашому регіоні."},url:""},
+  {n:{en:"A night at a winery",ua:"Ніч на виноробні"},d:{en:"Wake up among the vines — many estates have rooms or guesthouses.",ua:"Прокинутися серед виноградників — у багатьох маєтках є кімнати чи гостьові будинки."},url:""},
+  {n:{en:"A wine course",ua:"Винний курс"},d:{en:"For example WSET Level 1, or a sommelier's evening class.",ua:"Наприклад, WSET Level 1 або вечірній клас від сомельє."},url:""},
+ ]},
+ {e:"📚",t:{en:"Books",ua:"Книги"},items:[
+  {n:{en:"The World Atlas of Wine",ua:"The World Atlas of Wine"},d:{en:"Hugh Johnson & Jancis Robinson — the classic map book of wine regions.",ua:"Г'ю Джонсон і Дженсіс Робінсон — класичний атлас винних регіонів."},url:""},
+  {n:{en:"Wine Folly: Magnum Edition",ua:"Wine Folly: Magnum Edition"},d:{en:"Madeline Puckette — clear, visual, great for beginners.",ua:"Медлін Пакетт — зрозуміло, наочно, чудово для початківців."},url:""},
+ ]},
+ {e:"🧺",t:{en:"Made with love",ua:"Своїми руками"},items:[
+  {n:{en:"A mulled wine kit",ua:"Набір для глінтвейну"},d:{en:"A bottle of red, cinnamon, cloves, star anise, orange — and a recipe card.",ua:"Пляшка червоного, кориця, гвоздика, бадьян, апельсин — і листівка з рецептом."},url:""},
+  {n:{en:"A wine and cheese basket",ua:"Кошик вино + сир"},d:{en:"One bottle plus two or three local cheeses that suit it.",ua:"Одна пляшка і два-три місцеві сири, що до неї пасують."},url:""},
+ ]},
+];
+const GIFT_ASK={en:"Help me choose a Christmas gift for a wine lover. Ask me 2–3 short questions first (budget, what wines they like, where they live), then suggest a few specific ideas.",
+  ua:"Допоможи вибрати різдвяний подарунок для поціновувача вина. Спершу постав мені 2–3 короткі запитання (бюджет, які вина людина любить, де живе), а потім запропонуй кілька конкретних ідей."};
+export function GiftsModal({lang,onClose,onAsk}){
+  const t=L[lang];
+  return(<Modal onClose={onClose} wide>
+    <div style={{fontSize:20,fontWeight:700,color:TEXT,marginBottom:4}}>🎁 {t.gifts}</div>
+    <div style={{fontSize:13,color:MUTED,marginBottom:14,lineHeight:1.6}}>{t.giftsSub}</div>
+    {GIFTS.map((g,i)=>(<div key={i} style={{background:CARD,border:"1px solid "+B,borderRadius:12,padding:"14px",marginBottom:10}}>
+      <div style={{fontSize:16,fontWeight:700,color:ACCENT,marginBottom:8}}>{g.e} {g.t[lang]}</div>
+      {g.items.map((it,j)=>(<div key={j} style={{padding:"8px 0",borderTop:j?"1px solid "+B:"none",display:"flex",gap:10,alignItems:"flex-start"}}>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:700,color:TEXT}}>{it.c&&<span>{FLAG[it.c]} </span>}{it.n[lang]}</div>
+          <div style={{fontSize:13,color:MUTED,lineHeight:1.6}}>{it.d[lang]}</div>
+        </div>
+        {it.url&&<a href={it.url} target="_blank" rel="noopener noreferrer sponsored" onClick={()=>ga("gift_click",{item:it.n.en})} style={{flexShrink:0,alignSelf:"center",border:"1px solid "+B2,borderRadius:20,padding:"5px 12px",color:ACCENT,fontSize:12,fontWeight:600,textDecoration:"none"}}>{t.buy} →</a>}
+      </div>))}
+    </div>))}
+    {onAsk&&<button onClick={()=>{onClose();ga("gift_ask");onAsk(GIFT_ASK[lang]);}} style={{width:"100%",marginTop:4,background:BTN,border:"1px solid "+B2,borderRadius:10,padding:"12px",color:TEXT,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:FONT}}>💬 {t.giftAsk}</button>}
+  </Modal>);
+}
+
 /* ───────────── Advent calendar ───────────── */
 export function Advent({lang,onAsk,onCountry}){
   const t=L[lang];
@@ -373,6 +428,7 @@ export function Advent({lang,onAsk,onCountry}){
   const [showA,setShowA]=useState(false);
   const [showM,setShowM]=useState(false);
   const [showR,setShowR]=useState(false);
+  const [showG,setShowG]=useState(false);
   const [folded,setFolded]=useState(()=>lsGet("dionysia_advent_folded")==="1");
   const fold=(v)=>{setFolded(v);lsSet("dionysia_advent_folded",v?"1":"0");};
 
@@ -392,7 +448,7 @@ export function Advent({lang,onAsk,onCountry}){
     <button onClick={()=>{fold(true);ga("advent_fold");}} style={{position:"absolute",top:10,right:10,background:"rgba(196,154,90,0.1)",border:"1px solid "+B2,borderRadius:20,padding:"4px 12px",color:ACCENT,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:FONT}}>{t.collapse} ▴</button>
     <div style={{fontSize:18,fontWeight:700,color:TEXT,textAlign:"center",marginBottom:4,marginTop:22}}>🎄 {t.title}</div>
     <div style={{fontSize:13,color:MUTED,textAlign:"center",lineHeight:1.6,marginBottom:14}}>{upTo===0?t.soon(daysToDec1()):t.sub}</div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(58px,1fr))",gap:8}}>
+    <div className="adv-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(58px,1fr))",gap:8}}>
       {ADVENT.map((a,i)=>{const n=i+1,can=n<=upTo,isOp=opened.includes(n),isToday=n===today;
         return(<button key={n} onClick={()=>openDoor(n)} disabled={!can} title={can?a.t[lang]:t.locked+" "+n+" "+t.dec}
           style={{aspectRatio:"1",borderRadius:10,border:"1px solid "+(isToday?ACCENT:can?B2:B),background:isOp?"rgba(196,154,90,0.16)":can?BTN:"rgba(196,154,90,0.04)",
@@ -403,9 +459,10 @@ export function Advent({lang,onAsk,onCountry}){
     </div>
   </div>}
 
-  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,margin:"0 0 26px"}}>
+  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:10,margin:"0 0 26px"}}>
     <button onClick={()=>{setShowM(true);ga("markets_open");}} style={link}><span style={{fontSize:20}}>🎄</span>{t.markets}</button>
     <button onClick={()=>{setShowR(true);ga("recipes_open");}} style={link}><span style={{fontSize:20}}>🍷</span>{t.recipes}</button>
+    <button onClick={()=>{setShowG(true);ga("gifts_open");}} style={link}><span style={{fontSize:20}}>🎁</span>{t.gifts}</button>
   </div>
 
     {w&&(<Modal onClose={()=>setCur(null)}>
@@ -424,6 +481,7 @@ export function Advent({lang,onAsk,onCountry}){
     </Modal>)}
     {showM&&<MarketsModal lang={lang} onClose={()=>setShowM(false)} onCountry={onCountry}/>}
     {showR&&<RecipesModal lang={lang} onClose={()=>setShowR(false)}/>}
+    {showG&&<GiftsModal lang={lang} onClose={()=>setShowG(false)} onAsk={onAsk}/>}
   </>);
 }
 
@@ -547,7 +605,7 @@ export function XmasToggles({lang}){
     if(music){box.current.stop();setMusic(false);}else{box.current.play();setMusic(true);}
     ga("music_toggle",{on:!music});
   };
-  const st=(on)=>({background:on?"rgba(196,154,90,0.28)":"rgba(196,154,90,0.12)",border:"1.5px solid "+(on?ACCENT:B2),borderRadius:20,height:34,padding:"0 12px",display:"flex",alignItems:"center",gap:6,color:TEXT,fontSize:13,fontWeight:600,fontFamily:FONT,cursor:"pointer",opacity:1,position:"relative",padding:0,boxShadow:on?"0 0 12px rgba(196,154,90,0.55)":"none",transition:"all 0.2s"});
+  const st=(on)=>({background:on?"rgba(196,154,90,0.28)":"rgba(196,154,90,0.12)",border:"1.5px solid "+(on?ACCENT:B2),borderRadius:20,height:34,padding:"0 12px",display:"flex",alignItems:"center",gap:6,color:TEXT,fontSize:13,fontWeight:600,fontFamily:FONT,cursor:"pointer",opacity:1,position:"relative",whiteSpace:"nowrap",boxShadow:on?"0 0 12px rgba(196,154,90,0.55)":"none",transition:"all 0.2s"});
   const slash=<span style={{position:"absolute",left:7,right:7,top:"50%",height:2,background:ACCENT,transform:"rotate(-35deg)"}}/>;
   return(<>
     <style>{".xmas-t{position:absolute;left:24px;top:32px;display:flex;gap:6px;z-index:3}@media(max-width:1100px){.xmas-t{position:static;justify-content:center;margin:0 0 12px}}"}</style>
@@ -555,7 +613,7 @@ export function XmasToggles({lang}){
       <button onClick={toggleSnow} title={snow?t.snowOn:t.snowOff} aria-label={snow?t.snowOn:t.snowOff} aria-pressed={snow} style={st(snow)}><span style={{fontSize:17,position:"relative"}}>❄️{!snow&&slash}</span>{t.short.snow[snow?0:1]}</button>
       <button onClick={toggleMusic} title={music?t.musicOn:t.musicOff} aria-label={music?t.musicOn:t.musicOff} aria-pressed={music} style={st(music)}><span style={{fontSize:17,position:"relative"}}>🎵{!music&&slash}</span>{t.short.music[music?0:1]}</button>
     </div>
-    {music&&<div style={{position:"absolute",left:24,top:72,zIndex:3,display:"flex",alignItems:"center",gap:8,background:CARD,border:"1px solid "+B2,borderRadius:20,padding:"4px 6px 4px 12px",fontFamily:FONT,fontSize:12,color:TEXT,maxWidth:300}}>
+    {music&&<div className="xmas-p" style={{position:"absolute",left:24,top:72,zIndex:3,display:"flex",alignItems:"center",gap:8,background:CARD,border:"1px solid "+B2,borderRadius:20,padding:"4px 6px 4px 12px",fontFamily:FONT,fontSize:12,color:TEXT,maxWidth:300}}>
       <span style={{color:ACCENT}}>♪</span><span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{(TRACKS[lang]||TRACKS.en)[trackOf(track)]}</span>
       <button onClick={()=>box.current&&box.current.skip()} title={lang==="ua"?"Наступна":"Next"} aria-label={lang==="ua"?"Наступна":"Next"} style={{background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:15,padding:"0 4px"}}>⏭</button>
     </div>}

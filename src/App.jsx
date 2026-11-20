@@ -99,7 +99,7 @@ hotelsIn:"Hotels in",searchHotels:"Or search hotels directly",
 disclosure:"Some links on this site are affiliate links (e.g. Booking.com). If you book through them, we may earn a commission at no extra cost to you.",
 privacy:"Privacy",privTitle:"Privacy & affiliate disclosure",close:"Close",
 privBody:["Affiliate links: Dionysia contains affiliate links to Booking.com (via CJ Affiliate). If you click one and make a booking, we may earn a commission at no extra cost to you. Booking.com and CJ may set their own cookies when you click.","Chat: your chat messages are sent to Anthropic's Claude API to generate answers. Please do not enter personal or sensitive information. We do not store chat history on our servers.","Analytics: we use Vercel Analytics (anonymous, cookie-free) and, only if you accept, Google Analytics (cookies) to understand how the site is used.","You can change your cookie choice at any time using the \"Cookies\" link in the footer."],
-cookieText:"We use cookies for analytics.",accept:"Accept",decline:"Decline",cookies:"Cookies",
+cookieTitle:"🍷 May I see what you enjoy here?",cookieText:"Google Analytics cookies show me which countries and features people like, so I can make Dionysia better. No ads, no selling data.",accept:"Sure, accept",decline:"No, thanks",cookies:"Cookies",
 ask:"Ask Dionysia",newc:"New chat",ph:"Ask about wine regions, routes...",
 pour:"Pouring knowledge...",
 welcome:"Welcome to Dionysia 🍷\n\nI'm your personal wine travel guide — here to help you discover iconic wine routes, hidden vineyards, and unforgettable tasting experiences.\n\nChoose a destination above, or ask me anything.",
@@ -115,7 +115,7 @@ hotelsIn:"Готелі:",searchHotels:"Або шукайте готелі нап
 disclosure:"Частина посилань на сайті — партнерські (наприклад, Booking.com). Якщо ви забронюєте через них, ми можемо отримати комісію, а для вас ціна не зміниться.",
 privacy:"Конфіденційність",privTitle:"Конфіденційність і партнерські посилання",close:"Закрити",
 privBody:["Партнерські посилання: на Dionysia є партнерські посилання на Booking.com (через CJ Affiliate). Якщо ви перейдете за ним і забронюєте, ми можемо отримати комісію, а для вас ціна не зміниться. Booking.com і CJ можуть встановлювати власні cookies після кліку.","Чат: ваші повідомлення надсилаються до Claude API від Anthropic, щоб сформувати відповідь. Будь ласка, не вводьте особисті чи чутливі дані. Історію чату ми не зберігаємо на своїх серверах.","Аналітика: ми використовуємо Vercel Analytics (анонімно, без cookies) і, лише з вашої згоди, Google Analytics (cookies), щоб розуміти, як користуються сайтом.","Вибір щодо cookies можна змінити будь-коли через посилання «Cookies» внизу сторінки."],
-cookieText:"Ми використовуємо cookies для аналітики.",accept:"Прийняти",decline:"Відхилити",cookies:"Cookies",
+cookieTitle:"🍷 Можна я подивлюся, що вам тут цікаво?",cookieText:"Cookies Google Analytics показують, які країни й функції подобаються людям, — так я можу робити Dionysia кращою. Без реклами і без продажу даних.",accept:"Так, прийняти",decline:"Ні, дякую",cookies:"Cookies",
 ask:"Запитати",newc:"Новий чат",ph:"Запитай про винні маршрути...",
 pour:"Наливаємо знання...",
 welcome:"Ласкаво просимо до Діонісії 🍷\n\nЯ твій особистий гід у світі винного туризму — допоможу відкрити знакові маршрути, приховані виноградники і незабутні дегустації.\n\nОбери напрямок вище або просто запитай.",
@@ -488,6 +488,28 @@ flush();
 return <>{out}</>;
 }
 
+// "Buy me a glass" window: a few words about the author, then a link to PayPal
+const DONATE_TXT={
+en:{title:"🍷 Hi! I'm Anastasiia",body:["I love wine and travel, and I made Dionysia myself — to make it easier to find wine routes, hidden wineries and good places to stay.","The site is free, and I want to keep improving it: new countries, routes and features. If Dionysia helped you plan a trip or simply inspired you, you can buy me a glass of wine. Thank you!"],note:"On the PayPal page you'll see my name, Anastasiia Hirzekorn.",go:"Buy me a glass via PayPal →",later:"Maybe later"},
+ua:{title:"🍷 Привіт! Я Анастасія",body:["Я люблю вино і подорожі, і Dionysia створила сама — щоб було простіше знаходити винні маршрути, приховані виноробні та гарні місця для ночівлі.","Сайт безкоштовний, і я хочу й далі його покращувати: додавати нові країни, маршрути й функції. Якщо Dionysia допомогла вам спланувати подорож чи просто надихнула — можете пригостити мене келихом вина. Дякую!"],note:"На сторінці PayPal ви побачите моє ім'я — Anastasiia Hirzekorn.",go:"Пригостити через PayPal →",later:"Можливо, пізніше"}};
+function DonateModal({lang,onClose}) {
+const d=DONATE_TXT[lang]||DONATE_TXT.en;
+useEffect(()=>{const k=e=>{if(e.key==="Escape")onClose();};window.addEventListener("keydown",k);return()=>window.removeEventListener("keydown",k);},[onClose]);
+return (
+<div onClick={onClose} style={{position:"fixed",inset:0,zIndex:110,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+<div onClick={e=>e.stopPropagation()} style={{background:BG,border:"1px solid rgba(196,154,90,0.35)",borderRadius:16,maxWidth:460,width:"100%",maxHeight:"85vh",overflowY:"auto",padding:"26px 24px",position:"relative",fontFamily:"'Raleway',sans-serif"}}>
+<button onClick={onClose} aria-label="close" style={{position:"absolute",top:12,right:14,background:"none",border:"none",color:ACCENT,cursor:"pointer",fontSize:22,lineHeight:1}}>×</button>
+<div style={{fontSize:20,fontWeight:700,color:TEXT,marginBottom:12}}>{d.title}</div>
+{d.body.map((p,i)=><p key={i} style={{fontSize:14.5,color:MUTED,lineHeight:1.75,margin:"0 0 12px",fontWeight:500}}>{p}</p>)}
+<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>{gaEvent("donate_click",{place:"modal"});onClose();}}
+style={{display:"block",textAlign:"center",marginTop:6,background:"linear-gradient(135deg,#c49a5a,#a87d40)",borderRadius:22,padding:"12px",color:"#1a0a0e",fontSize:15,fontWeight:700,textDecoration:"none"}}>{d.go}</a>
+<div style={{fontSize:11.5,color:DIM,textAlign:"center",margin:"8px 0 4px",lineHeight:1.5}}>{d.note}</div>
+<button onClick={onClose} style={{display:"block",margin:"6px auto 0",background:"none",border:"none",color:MUTED,fontSize:13,cursor:"pointer",textDecoration:"underline",fontFamily:"'Raleway',sans-serif"}}>{d.later}</button>
+</div>
+</div>
+);
+}
+
 function PrivacyModal({t,onClose}) {
 return (
 <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:110,background:"rgba(10,4,8,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
@@ -535,14 +557,14 @@ sub:"Обери кілька параметрів — Діонісія скла�
 days:"Днів",where:"Куди",wine:"Вино",style:"Стиль",btn:"Скласти маршрут →",
 any:"Будь-де / порадь",anyW:"Будь-яке",
 wines:{red:"Червоне",white:"Біле",sparkling:"Ігристе",sweet:"Солодке"},
-styles:{relaxed:"Спокійно",foodie:"Гастро",hidden:"Приховані місця",budget:"Бюджетно"}
+styles:{relaxed:"Спокійно",foodie:"Гастро",hidden:"Приховані місця",budget:"Бюджетно"},xmasStyle:"🎄 Різдвяна",xmasHint:"різдвяна поїздка: додай різдвяні ярмарки, глінтвейн і святкові страви, і попередь, які виноробні та ресторани зачинені 24–26 грудня та 1 січня"
 }:{
 title:"Plan your wine trip in a minute",
 sub:"Pick a few options and Dionysia will build a day-by-day route with wineries, food and tips.",
 days:"Days",where:"Where",wine:"Wine",style:"Style",btn:"Build my route →",
 any:"Anywhere / suggest",anyW:"Any",
 wines:{red:"Red",white:"White",sparkling:"Sparkling",sweet:"Sweet"},
-styles:{relaxed:"Relaxed",foodie:"Foodie",hidden:"Hidden gems",budget:"Budget"}
+styles:{relaxed:"Relaxed",foodie:"Foodie",hidden:"Hidden gems",budget:"Budget"},xmasStyle:"🎄 Christmas",xmasHint:"Christmas trip: include Christmas markets, mulled wine and festive dishes, and warn which wineries and restaurants close on 24–26 Dec and 1 Jan"
 };
 const sel={width:"100%",background:"rgba(26,8,16,0.6)",color:TEXT,border:"1px solid "+B,borderRadius:8,padding:"9px 8px",fontSize:14,fontFamily:"'Raleway',sans-serif"};
 const lab={fontSize:11,letterSpacing:"0.15em",textTransform:"uppercase",color:DIM,marginBottom:5,fontWeight:600};
@@ -550,7 +572,8 @@ const go=()=>{
 const c=COUNTRIES.find(x=>x.code===where);
 const cn=c?(ua?c.nameUA:c.name):null;
 const w=wine==="any"?null:L.wines[wine];
-const st=L.styles[style];
+const STY=inSeason()?{christmas:L.xmasHint,...L.styles}:L.styles;
+const st=STY[style]||L.styles.relaxed;
 const msg=ua&&!cn
 ?"Я планую винну поїздку на "+days+" "+(days==="1"?"день":(+days<5?"дні":"днів"))+(w?". Улюблене вино: "+w.toLowerCase():"")+". Стиль: "+st.toLowerCase()+". Запропонуй 2–3 різні напрямки з різних країн, коротко поясни, чим кожен підходить, і запитай, для якого скласти повний маршрут по днях."
 :!ua&&!cn
@@ -569,7 +592,7 @@ return (
 <div><div style={lab}>{L.days}</div><select style={sel} value={days} onChange={e=>setDays(e.target.value)}>{["1","2","3","4","5","7"].map(d=><option key={d} value={d}>{d}</option>)}</select></div>
 <div><div style={lab}>{L.where}</div><select style={sel} value={where} onChange={e=>setWhere(e.target.value)}><option value="any">{L.any}</option>{sortedCountries(lang).map(c=><option key={c.code} value={c.code}>{c.flag} {ua?c.nameUA:c.name}</option>)}</select></div>
 <div><div style={lab}>{L.wine}</div><select style={sel} value={wine} onChange={e=>setWine(e.target.value)}><option value="any">{L.anyW}</option>{Object.entries(L.wines).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
-<div><div style={lab}>{L.style}</div><select style={sel} value={style} onChange={e=>setStyle(e.target.value)}>{Object.entries(L.styles).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
+<div><div style={lab}>{L.style}</div><select style={sel} value={style} onChange={e=>setStyle(e.target.value)}>{Object.entries(inSeason()?{christmas:L.xmasStyle,...L.styles}:L.styles).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div>
 </div>
 <button onClick={go} style={{width:"100%",background:BTN,color:TEXT,border:"1px solid "+B2,borderRadius:10,padding:"12px",fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Raleway',sans-serif"}}>{L.btn}</button>
 </div>
@@ -588,6 +611,7 @@ const [view,setView]=useState(initRoute.view);
 const [tab,setTab]=useState("famous");
 const [popup,setPopup]=useState(null);
 const [showPriv,setShowPriv]=useState(false);
+const [showDon,setShowDon]=useState(false);
 const [plan,setPlan]=useState(null); // {idx, where} — reply index that gets a hotels button
 const [consent,setConsent]=useState("pending");
 const endRef=useRef(null);
@@ -601,7 +625,8 @@ useEffect(()=>{setMsgs(m=>m.length===1&&m[0].role==="assistant"?[{role:"assistan
 const applyConsent=(v)=>{try{if(window.gtag)window.gtag("consent","update",{analytics_storage:v==="granted"?"granted":"denied"});}catch(e){}};
 useEffect(()=>{
 let v=null;try{v=localStorage.getItem("dionysia_consent");}catch(e){}
-if(v==="granted"||v==="denied"){applyConsent(v);setConsent(v);}else setConsent("ask");
+if(v==="granted"||v==="denied"){applyConsent(v);setConsent(v);return;}
+const tm=setTimeout(()=>setConsent(c=>c==="pending"?"ask":c),4000);return()=>clearTimeout(tm);
 },[]);
 const choose=(v)=>{try{localStorage.setItem("dionysia_consent",v);}catch(e){}applyConsent(v);setConsent(v);};
 
@@ -680,11 +705,11 @@ return (
 <div style={{position:"fixed",inset:0,zIndex:0,background:"radial-gradient(ellipse at 20% 50%,rgba(160,30,50,0.08) 0%,transparent 60%)",pointerEvents:"none"}}/>
 
 {/* Header */}
-<div style={{width:"100%",maxWidth:700,padding:"28px 24px 16px",textAlign:"center",zIndex:1,position:"relative"}}>
+<div className="wide" style={{width:"100%",maxWidth:700,padding:"28px 24px 16px",textAlign:"center",zIndex:1,position:"relative"}}>
 <div className="top-bar">
 <XmasToggles lang={lang}/>
 <div className="top-r">
-{DONATE_URL&&<a href={DONATE_URL} target="_blank" rel="noopener noreferrer" onClick={()=>gaEvent("donate_click",{place:"header"})}
+{DONATE_URL&&<a href={DONATE_URL} onClick={e=>{e.preventDefault();gaEvent("donate_open",{});setShowDon(true);}}
 title={lang==="ua"?"Пригостити Dionysia келихом":"Buy Dionysia a glass of wine"}
 style={{display:"flex",alignItems:"center",gap:6,height:30,padding:"0 13px",border:"1.5px solid "+B2,borderRadius:20,color:TEXT,textDecoration:"none",fontSize:12,fontWeight:600,background:"rgba(196,154,90,0.14)",fontFamily:"'Raleway',sans-serif",whiteSpace:"nowrap"}}
 >🍷 <span className="don-l">{lang==="ua"?"Пригостити келихом":"Buy me a glass"}</span><span className="don-s">{lang==="ua"?"Келих":"Tip"}</span></a>}
@@ -703,7 +728,7 @@ onMouseOut={e=>{e.currentTarget.style.borderColor=B;e.currentTarget.style.color=
 </div>
 
 {/* Content */}
-<div style={{width:"100%",maxWidth:700,flex:1,padding:"0 16px 16px",zIndex:1}}>
+<div className="wide" style={{width:"100%",maxWidth:700,flex:1,padding:"0 16px 16px",zIndex:1}}>
 
 {view==="home"&&(
 <div>
@@ -853,8 +878,7 @@ return (<div style={{display:"flex",justifyContent:"flex-start",marginTop:10}}>
 </div>
 
 {/* Footer: affiliate disclosure + privacy + cookie settings */}
-<div style={{width:"100%",maxWidth:700,padding:"6px 24px 10px",textAlign:"center",zIndex:1}}>
-<p style={{fontSize:11,color:DIM,lineHeight:1.6,margin:"0 0 8px"}}>{t.disclosure}</p>
+<div className="wide" style={{width:"100%",maxWidth:700,padding:"6px 24px 10px",textAlign:"center",zIndex:1}}>
 <div style={{fontSize:12,color:DIM}}>
 <span onClick={()=>setShowPriv(true)} style={{cursor:"pointer",textDecoration:"underline"}}>{t.privacy}</span>
 <span style={{margin:"0 10px"}}>·</span>
@@ -863,7 +887,7 @@ return (<div style={{display:"flex",justifyContent:"flex-start",marginTop:10}}>
 </div>
 
 {/* Input */}
-<div style={{width:"100%",maxWidth:700,padding:"12px 16px 20px",position:"sticky",bottom:0,background:"linear-gradient(transparent,"+BG+" 30%)",zIndex:2}}>
+<div className="wide" style={{width:"100%",maxWidth:700,padding:"12px 16px 20px",position:"sticky",bottom:0,background:"linear-gradient(transparent,"+BG+" 30%)",zIndex:2}}>
 <div style={{display:"flex",gap:10,background:CARD,border:"1px solid rgba(196,154,90,0.25)",borderRadius:28,padding:"8px 8px 8px 20px",alignItems:"flex-end"}}>
 <textarea value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={onKey}
 placeholder={t.ph} rows={1}
@@ -876,14 +900,17 @@ style={{width:40,height:40,borderRadius:"50%",background:inp.trim()&&!load?BTN:"
 </div>
 
 {showPriv&&<PrivacyModal t={t} onClose={()=>setShowPriv(false)}/>}
+{showDon&&<DonateModal lang={lang} onClose={()=>setShowDon(false)}/>}
 
 {consent==="ask"&&(
-<div style={{position:"fixed",left:12,right:12,bottom:90,zIndex:120,maxWidth:560,margin:"0 auto",background:BG,border:"1px solid "+B2,borderRadius:14,padding:"14px 16px",boxShadow:"0 8px 30px rgba(0,0,0,0.5)"}}>
-<div style={{fontSize:13,color:MUTED,lineHeight:1.6,marginBottom:10,fontWeight:500}}>{t.cookieText}</div>
+<div className="ck" style={{position:"fixed",left:12,right:12,bottom:96,zIndex:120,maxWidth:480,margin:"0 auto",background:"linear-gradient(160deg,#2a1418,"+BG+")",border:"1.5px solid "+B2,borderRadius:18,padding:"16px 18px 14px",boxShadow:"0 10px 40px rgba(0,0,0,0.6)",fontFamily:"'Raleway',sans-serif"}}>
+<div style={{fontSize:15,color:TEXT,fontWeight:700,marginBottom:6}}>{t.cookieTitle}</div>
+<div style={{fontSize:13,color:MUTED,lineHeight:1.6,marginBottom:12,fontWeight:500}}>{t.cookieText}</div>
 <div style={{display:"flex",gap:8}}>
-<button onClick={()=>choose("granted")} style={{flex:1,background:BTN,border:"1px solid "+B2,borderRadius:20,padding:"8px 0",color:TEXT,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer"}}>{t.accept}</button>
-<button onClick={()=>choose("denied")} style={{flex:1,background:"none",border:"1px solid "+B,borderRadius:20,padding:"8px 0",color:MUTED,fontSize:13,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer"}}>{t.decline}</button>
+<button onClick={()=>choose("granted")} style={{flex:1,background:"linear-gradient(135deg,#c49a5a,#a87d40)",border:"none",borderRadius:20,padding:"10px 0",color:"#1a0a0e",fontSize:14,fontFamily:"'Raleway',sans-serif",fontWeight:700,cursor:"pointer"}}>{t.accept}</button>
+<button onClick={()=>choose("denied")} style={{flex:1,background:"none",border:"1px solid "+B2,borderRadius:20,padding:"10px 0",color:TEXT,fontSize:14,fontFamily:"'Raleway',sans-serif",fontWeight:600,cursor:"pointer"}}>{t.decline}</button>
 </div>
+<span onClick={()=>setShowPriv(true)} style={{display:"block",textAlign:"center",marginTop:8,fontSize:11,color:DIM,textDecoration:"underline",cursor:"pointer"}}>{t.privacy}</span>
 </div>
 )}
 
@@ -910,6 +937,13 @@ textarea::placeholder{color:#5a3838;font-family:'Raleway',sans-serif}
 .top-r{display:flex;gap:8px;align-items:center}
 .don-s{display:none}
 @media(max-width:560px){.don-l{display:none}.don-s{display:inline}}
+@keyframes ckin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.ck{animation:ckin .45s ease-out}
+.top-bar .xmas-p{position:static!important;order:3}
+.top-bar .xmas-t{order:1}
+.top-r{order:2}
+@media(max-width:430px){.top-bar{gap:6px;margin-left:-14px;margin-right:-14px}.xmas-t{gap:6px!important}.xmas-t button,.top-r a,.top-r button{height:30px!important;padding:0 9px!important;font-size:12px!important}.xmas-t button span{font-size:14px!important}}
+@media(min-width:1200px){.wide{max-width:960px!important}.adv-grid{grid-template-columns:repeat(12,1fr)!important}}
 `}</style>
 </div>
 );
